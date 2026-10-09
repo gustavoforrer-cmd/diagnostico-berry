@@ -997,6 +997,8 @@ function touch(){
 function setStatus(t){
   const el=document.getElementById("save-status");
   const txt=S.exemplo?"Exemplo — não salvo":t?t:ondeSalvo==="time"?"Salvo no histórico do time":ondeSalvo==="local"?"Salvo só neste navegador":ondeSalvo==="erro"?"Não foi possível salvar":"Salvo";
+  const site=!inArtifact(); /* no site, salvar no navegador é o normal (não é aviso) */
+  if(site&&!t&&ondeSalvo==="local"&&!S.exemplo){el.classList.remove("ex","err"); el.title="Os diagnósticos ficam salvos neste navegador, neste computador."; el.querySelector("span").textContent="Salvo neste computador"; return;}
   el.classList.toggle("ex",S.exemplo||ondeSalvo==="local"); el.classList.toggle("err",ondeSalvo==="erro"&&!S.exemplo);
   el.title=ondeSalvo==="local"?"Sua conta não tem permissão para gravar no histórico do time (ou você não está logado no Claude). O diagnóstico fica salvo neste navegador.":ondeSalvo==="erro"?"O navegador bloqueou o armazenamento. Baixe o PDF antes de fechar.":"";
   el.querySelector("span").textContent=txt;
@@ -1498,7 +1500,7 @@ async function renderDrawer(){
   items.sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||""));
   root.innerHTML=`<div class="scrim" data-close></div>
   <aside class="drawer" role="dialog" aria-label="Histórico de diagnósticos">
-    <div class="drawer-h"><div><h2>Histórico</h2><div class="mt" style="font-size:12px;color:var(--muted)">${store.kind==="db"?"Compartilhado com o time":"Salvo neste navegador (faça login no Claude para ver o histórico do time)"}</div></div><button class="btn ghost" type="button" data-close>Fechar</button></div>
+    <div class="drawer-h"><div><h2>Histórico</h2><div class="mt" style="font-size:12px;color:var(--muted)">${store.kind==="db"?"Compartilhado com o time":inArtifact()?"Salvo neste navegador (faça login no Claude para ver o histórico do time)":"Salvo neste computador"}</div></div><button class="btn ghost" type="button" data-close>Fechar</button></div>
     <div class="drawer-b">
       <div class="hitem ${S.exemplo?"cur":""}"><div class="grow"><div class="nm">Panificadora Muriel</div><div class="mt">Exemplo</div></div><button class="btn" type="button" data-open-example>Ver</button></div>
       ${items.length?items.map(it=>{const c=calc(it);return `<div class="hitem ${it.id===S.id?"cur":""}"><div class="grow">
