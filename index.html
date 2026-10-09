@@ -1,0 +1,1611 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Ferramenta de diagnóstico empresarial da Berry Consultoria.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='170 150 460 490'%3E%3Cg fill='none' stroke-width='54'%3E%3Ccircle cx='290' cy='272' r='86' stroke='%230D30A4'/%3E%3Ccircle cx='290' cy='524' r='86' stroke='%230D30A4'/%3E%3Ccircle cx='508' cy='398' r='86' stroke='%2347C97E'/%3E%3C/g%3E%3C/svg%3E">
+</head>
+<body>
+<title>Diagnóstico Berry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  color-scheme:dark;
+  /* Berry — neutros (90–95%) */
+  --black:#05060C; --gray-light:#F0F0F0; --gray:#7A7A7A;
+  /* Berry — destaques (5–10%) */
+  --blue:#0D30A4; --blue-hover:#1238C4; --accent-ink:#8FA3F2;
+  --green:#47C97E; --green-ink:#47C97E;
+  --ink:#F0F0F0; --muted:#A3A3A3; --faint:#7A7A7A;
+  --bg:#05060C; --surface:#101116; --surface-2:#16171D;
+  --line:#23252C; --line-strong:#34363F;
+  --tint-blue:#0E1638; --tint-green:#0E2618;
+  --bad:#E8715F; --bad-tint:#2A1411;
+  --warn:#E3A63B; --warn-tint:#2A200D;
+  --good:#47C97E; --good-tint:#0E2618;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  --display:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background-color:var(--bg);background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:56px 56px;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0;font-family:var(--display);font-weight:500}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(5,6,12,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:30px;height:30px;flex:none}
+.brand b{font-family:var(--display);font-weight:500;letter-spacing:-.01em}
+.brand span{color:var(--muted);font-size:13px}
+.top-meta{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.status{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block}
+.status.ex i{background:var(--warn)}
+.status.err i{background:var(--bad)}
+.status.err{color:var(--bad)}
+.live{font-family:var(--mono);font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink);white-space:nowrap}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{border-color:var(--gray)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-hover)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+
+.banner{background:var(--warn-tint);color:var(--ink);border-bottom:1px solid var(--line)}
+.banner-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14px}
+
+/* ---------- layout ---------- */
+.shell{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 60px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:36px}
+.steps{position:sticky;top:calc(env(safe-area-inset-top,0px) + 80px);align-self:start;display:flex;flex-direction:column;gap:2px}
+.step{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:10px;cursor:pointer;border:0;background:none;text-align:left;width:100%}
+.step:hover{background:var(--surface)}
+.step .n{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;font-family:var(--mono);font-size:12px;flex:none;color:var(--muted)}
+.step .t{font-family:var(--display);font-weight:500;font-size:14px;line-height:1.3}
+.step .s{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.step.on{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.step.on .n{background:var(--ink);border-color:var(--ink);color:var(--black)}
+.step.done .n{background:var(--tint-green);border-color:var(--green);color:var(--green-ink)}
+main{min-width:0}
+.head{margin-bottom:22px}
+.eyebrow{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.head h1{font-size:30px;letter-spacing:-.015em;margin-top:6px}
+.head p{color:var(--muted);margin:6px 0 0;max-width:62ch}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label,.lbl{font-size:13px;font-weight:600}
+.field small{color:var(--muted);font-size:12px}
+.inp{width:100%;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:8px;padding:10px 12px;font-size:15px}
+.inp:focus{border-color:var(--accent-ink);outline:none;box-shadow:0 0 0 3px var(--tint-blue)}
+textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
+.money{font-family:var(--mono);font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;background:var(--surface-2);user-select:none}
+.tipos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tipo{display:flex;flex-direction:column;gap:2px;text-align:left;border:1.5px solid var(--line-strong);border-radius:10px;padding:10px 12px;background:var(--surface-2);cursor:pointer}
+.tipo b{font-size:14px;font-family:var(--display);font-weight:500}
+.tipo span{font-size:12px;color:var(--muted);line-height:1.35}
+.tipo[aria-pressed="true"]{border-color:var(--ink);background:var(--surface)}
+.tipo[aria-pressed="true"] b::before{content:"● ";color:var(--green)}
+@media (max-width:860px){.tipos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--black);font-weight:500}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+
+.navrow{display:flex;justify-content:space-between;gap:12px;margin-top:22px;flex-wrap:wrap}
+
+/* ---------- numbers / urgency ---------- */
+.nums{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.gapcard{background:linear-gradient(180deg,#0B0E1E,#08090F);border:1px solid var(--line-strong);border-top:3px solid var(--blue);color:var(--ink);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:16px}
+.gapcard .eyebrow{color:var(--muted)}
+.gapbig{font-family:var(--display);font-size:40px;font-weight:500;letter-spacing:-.02em;line-height:1.1}
+.gapline{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:10px;font-size:14px;color:var(--muted)}
+.gapline b{font-family:var(--display);font-weight:500;white-space:nowrap;color:var(--ink)}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.gapcard .muted{color:var(--muted);font-size:13px}
+.gapcard .muted b{color:#fff}
+.calc{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.calc div{display:flex;justify-content:space-between;gap:10px;color:var(--muted)}
+.calc b{color:var(--ink)}
+.calc b{font-family:var(--mono);white-space:nowrap}
+.calc .eq{border-top:1px solid var(--line-strong);padding-top:6px;font-weight:600;color:var(--ink)}
+.lk-head{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 0 6px;border-top:0}
+.lk-head div:nth-child(n+2){text-align:right}
+.leaks-h{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.leaks{display:flex;flex-direction:column}
+.leak{display:grid;grid-template-columns:minmax(0,1fr) 92px 110px;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.leak.total{border-top:2px solid var(--ink);font-size:16px}
+.lk-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lk-t span{font-size:13px;color:var(--muted)}
+.lk-t .lk-src{font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dot.b{background:var(--bad)}.dot.i{background:var(--warn)}
+.lk-p{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.lk-p .inp{width:72px;text-align:right;padding:6px 8px;font-size:14px}
+.lk-p small{font-size:11px;color:var(--muted);white-space:nowrap}
+.lk-p .linkbtn{font-size:11px}
+.lk-v{text-align:right;font-weight:500;font-family:var(--display);white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:620px){.leak{grid-template-columns:minmax(0,1fr) 80px;}.lk-v{grid-column:1/-1;text-align:left}}
+
+/* ---------- questions ---------- */
+.qtools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.prog{flex:1;min-width:180px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.prog .track{flex:1;height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.prog .track i{display:block;height:100%;background:var(--green)}
+.pillar-h{display:flex;align-items:baseline;gap:10px;margin:26px 0 10px}
+.pillar-h:first-of-type{margin-top:4px}
+.pillar-h h2{font-size:18px;display:flex;align-items:center;gap:10px}
+.pillar-h h2::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px rgba(13,48,164,.25)}
+.pillar-h span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;margin-bottom:12px}
+.q.answered{border-color:var(--line-strong)}
+.qtop{display:flex;gap:12px;align-items:flex-start}
+.qid{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px;flex:none;width:28px}
+.qbody{flex:1;min-width:0}
+.qtitle{font-family:var(--display);font-weight:500;font-size:16.5px;line-height:1.35}
+.weight{display:inline-flex;gap:3px;vertical-align:middle;margin-left:8px}
+.weight i{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+.weight i.on{background:var(--ink)}
+.dig{margin-top:8px;font-size:14px;color:var(--muted);display:flex;gap:8px}
+.dig b{color:var(--green);font-weight:500;font-family:var(--display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding-top:2px;flex:none}
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.lv{position:relative}
+.lv input{position:absolute;opacity:0;pointer-events:none}
+.lv label{display:flex;flex-direction:column;gap:4px;height:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--surface-2);font-size:13px;color:var(--muted);line-height:1.4}
+.lv label b{font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;font-family:var(--display);font-weight:500}
+.lv label b::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.lv input:focus-visible+label{outline:2px solid var(--green);outline-offset:2px}
+.lv input:checked+label{border-color:var(--c);background:var(--ct);color:var(--ink)}
+.lv.b{--c:var(--bad);--ct:var(--bad-tint)}
+.lv.i{--c:var(--warn);--ct:var(--warn-tint)}
+.lv.a{--c:var(--good);--ct:var(--good-tint)}
+.qfoot{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--ink)}
+.linkbtn.on{color:var(--accent-ink);font-weight:600;text-decoration:none}
+.note{margin-top:10px}
+
+/* ---------- pain ---------- */
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale button{width:40px;height:40px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface-2);cursor:pointer;font-family:var(--mono);font-weight:600}
+.scale button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--black)}
+.hint{font-size:13px;color:var(--muted);margin-top:2px}
+.auto-parecer{white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.6}
+.divider{grid-column:1/-1;border-top:1px dashed var(--line-strong);margin:6px 0}
+
+/* ---------- result ---------- */
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.toast{font-size:13px;color:var(--green-ink);font-family:var(--mono);flex-basis:100%}
+.toast.warn{color:var(--warn)}
+.plano-b{background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;padding:16px;margin-bottom:18px}
+.pb-h{font-size:14px;line-height:1.55;color:var(--muted);margin-bottom:12px}
+.pb-h b{color:var(--ink)}
+.pb-motivo{color:var(--warn);margin-bottom:8px}
+.pb-motivo b{color:var(--warn)}
+.pb-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.plano-b img{display:block;width:100%;max-width:820px;margin:0 auto;border-radius:6px;background:#fff}
+.docwrap{overflow-x:auto;border-radius:6px;box-shadow:var(--shadow)}
+
+/* ---------- drawer ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);z-index:41;display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.15);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer-h{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer-h h2{font-size:18px}
+.drawer-b{overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:8px}
+.hitem{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.hitem.cur{border-color:var(--ink)}
+.hitem .grow{flex:1;min-width:0}
+.hitem .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hitem .mt{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.hscore{font-family:var(--mono);font-weight:600;font-size:18px;text-align:right;line-height:1.1}
+.hscore small{display:block;font-size:10px;letter-spacing:.06em;font-weight:500}
+.hbtns{display:flex;gap:6px;margin-top:8px}
+.hbtns .btn{padding:5px 10px;font-size:13px}
+.empty{color:var(--muted);font-size:14px;padding:20px 4px}
+
+/* ============ REPORT DOCUMENT (always light, it is paper) ============ */
+.doc{--d-blue:#0D30A4;--d-green:#47C97E;--d-ink:#05060C;--d-muted:#6E6E6E;--d-line:#E6E6E6;--d-soft:#F0F0F0;--d-gray:#7A7A7A;
+  --d-bad:#C9402F;--d-warn:#B97800;--d-good:#23894F;
+  background:#fff;color:var(--d-ink);font-family:var(--sans);font-size:13px;line-height:1.55;width:100%;max-width:820px;min-width:640px;margin:0 auto;padding:36px 40px 40px;color-scheme:light;font-variant-numeric:normal;font-feature-settings:"calt" 0,"liga" 0,"tnum" 0;font-variant-ligatures:none}
+.doc *{font-variant-numeric:normal}
+.doc h1,.doc h2,.doc .v,.doc .big,.doc .pt,.doc .nm{font-family:var(--display);font-weight:500}
+.doc h2{font-size:16px;letter-spacing:-.005em;margin:0 0 12px;display:flex;align-items:center;gap:10px;color:var(--d-ink)}
+.doc h2::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--d-blue);flex:none}
+.doc section{margin-top:30px}
+.d-cover{background-color:#05060C;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:32px 32px;color:#F0F0F0;border-radius:12px;padding:26px 30px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.d-cover .logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:500;font-size:18px;color:#F0F0F0}
+.d-cover .logo svg{width:32px;height:32px}
+.d-cover .kicker{font-family:var(--display);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9A9A9A;margin-top:26px}
+.d-cover h1{font-size:30px;letter-spacing:-.015em;margin-top:4px;color:#FFFFFF}
+.d-cover .sub{color:#A3A3A3;margin-top:4px}
+.d-meta{text-align:right;font-size:12px;color:#A3A3A3;line-height:1.8}
+.d-meta b{color:#F0F0F0;font-weight:500}
+.d-kpis{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:12px}
+.d-kpi{border:1px solid var(--d-line);border-radius:10px;padding:14px 16px}
+.d-kpi .k{font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted)}
+.d-kpi .v{font-size:26px;letter-spacing:-.02em;line-height:1.2;margin-top:4px}
+.d-kpi .x{font-size:12px;color:var(--d-muted)}
+.d-kpi.hero{display:flex;gap:14px;align-items:center;background:var(--d-soft);border-color:transparent}
+.pill{display:inline-block;font-family:var(--display);font-size:10px;font-weight:500;letter-spacing:.1em;padding:3px 8px;border-radius:99px;text-transform:uppercase}
+.pill.b{background:#FCEDEA;color:var(--d-bad)}.pill.i{background:#FDF4E1;color:var(--d-warn)}.pill.a{background:#E8F6EE;color:var(--d-good)}
+.pill.n{background:var(--d-soft);color:var(--d-ink)}
+.d-gap{background-color:#05060C;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:32px 32px;color:#F0F0F0;border-radius:12px;border-top:3px solid var(--d-blue);padding:20px 22px;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center}
+.d-gap .big{font-size:32px;letter-spacing:-.02em;line-height:1.1;margin-top:6px;color:#fff}
+.d-gap .lab{font-size:12px;color:#A3A3A3}
+.d-gap .rows{display:flex;flex-direction:column;gap:8px}
+.d-gap .row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:#BDBDBD;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:6px}
+.d-gap .row:last-child{border:0;padding:0}
+.d-gap .row b{font-family:var(--display);font-weight:500;color:#fff;white-space:nowrap}
+.d-gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.d-g{border:1px solid var(--d-line);border-radius:10px;padding:10px 8px 8px;text-align:center}
+.d-g .nm{font-size:12.5px}
+.d-g svg{width:100%;max-width:150px;height:auto;display:block;margin:0 auto}
+.d-best{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.d-best div{border-radius:10px;padding:10px 14px;font-size:12px;color:var(--d-muted);background:var(--d-soft)}
+.d-best b{display:block;font-family:var(--display);font-weight:500;font-size:15px;color:var(--d-ink)}
+.d-best .g{border-left:3px solid var(--d-green)}.d-best .r{border-left:3px solid var(--d-bad)}
+.d-crit{width:100%;border-collapse:collapse}
+.d-crit th{text-align:left;font-family:var(--display);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);font-weight:500;padding:0 10px 6px;border-bottom:1px solid var(--d-ink)}
+.d-crit td{vertical-align:top;padding:10px;border-bottom:1px solid var(--d-line);font-size:12.5px}
+.d-crit td:first-child{width:118px}
+.d-crit .pt{margin-bottom:2px}
+.d-crit .pl{font-size:11px;color:var(--d-muted)}
+.d-crit .sol{color:var(--d-ink)}
+.d-crit .sol::before{content:"→ ";color:var(--d-green);font-weight:700}
+.d-counts{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.d-counts span{font-size:12px;background:var(--d-soft);border-radius:99px;padding:3px 10px}
+.d-counts b{font-family:var(--display);font-weight:500}
+.d-rbars{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.rb{display:grid;grid-template-columns:140px 1fr 100px;gap:12px;align-items:center;font-size:12.5px}
+.rb-t{height:14px;background:var(--d-soft);border-radius:4px;overflow:hidden}
+.rb-t i{display:block;height:100%;border-radius:4px}
+.rb b{text-align:right;font-family:var(--display);font-weight:500}
+.d-tr{display:grid;gap:0 16px;padding:10px 10px;border-bottom:1px solid var(--d-line);font-size:12.5px;align-items:start}
+.d-th{font-family:var(--display);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);font-weight:500;padding-top:0;padding-bottom:6px;border-bottom:1px solid var(--d-ink)}
+.d-tr .pt{font-family:var(--display);font-weight:500;margin-bottom:2px}
+.d-tr .pl{font-size:11px;color:var(--d-muted)}
+.d-tr .num{text-align:right;font-family:var(--display);font-weight:500;white-space:nowrap}
+.d-tr .sol::before{content:"→ ";color:var(--d-green);font-weight:700}
+.d-total{border-bottom:0}
+.d-leaks td:first-child{width:auto}
+.d-leaks td:nth-child(2){width:170px}
+.d-quotes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-quote{border-left:3px solid var(--d-green);background:var(--d-soft);padding:10px 14px;border-radius:0 8px 8px 0}
+.d-quote .qq{font-size:10.5px;color:var(--d-muted);font-family:var(--display);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.d-quote p{margin:0;font-style:italic}
+.d-quote p.lst{font-style:normal}
+.d-parecer{border:1px solid var(--d-line);border-radius:10px;padding:16px 18px;white-space:pre-wrap}
+.d-next{margin-top:10px;background:var(--d-soft);border-radius:10px;padding:14px 18px}
+.d-next b{color:var(--d-ink);font-family:var(--display);font-weight:500}
+.d-foot{margin-top:30px;padding-top:12px;border-top:1px solid var(--d-line);display:flex;justify-content:space-between;font-size:11px;color:var(--d-muted)}
+.avoid{break-inside:avoid;page-break-inside:avoid}
+#pdf-stage{position:fixed;left:-10000px;top:0;width:794px}
+#pdf-stage .doc{min-width:0;max-width:none;width:794px}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:16px 60px;padding-inline:16px}
+  .steps{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .step{width:auto;flex:none;padding:8px 10px}
+  .step .s{display:none}
+  .nums{grid-template-columns:minmax(0,1fr)}
+  .topbar-in,.banner-in{padding-inline:16px}
+}
+@media (max-width:620px){
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .levels{grid-template-columns:minmax(0,1fr)}
+  .brand span{display:none}
+  .head h1{font-size:23px}
+  .panel{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  body{background:#fff}
+  body > *:not(#print-area){display:none!important}
+  #print-area{display:block!important}
+  #print-area .doc{min-width:0;padding:0;max-width:none}
+  @page{size:A4;margin:12mm}
+}
+#print-area{display:none}
+</style>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <svg viewBox="170 150 460 490" aria-hidden="true"><g fill="none" stroke-width="54"><circle cx="290" cy="272" r="86" stroke="#0D30A4"/><circle cx="290" cy="524" r="86" stroke="#0D30A4"/><circle cx="508" cy="398" r="86" stroke="#47C97E"/></g></svg>
+      <div><b>Diagnóstico Berry</b> <span id="top-company"></span></div>
+    </div>
+    <div class="top-meta">
+      <span class="live" id="live-score" title="Nota parcial">Nota —</span>
+      <span class="status" id="save-status"><i></i><span>—</span></span>
+      <button class="btn ghost" id="btn-history" type="button">Histórico</button>
+      <button class="btn" id="btn-new" type="button">+ Novo diagnóstico</button>
+    </div>
+  </div>
+</header>
+<div class="banner" id="example-banner" hidden>
+  <div class="banner-in"><span><b>Diagnóstico de exemplo.</b> Os dados da Panificadora Muriel servem só para você ver como tudo funciona; nada aqui é salvo.</span><button class="btn primary" type="button" data-action="new">Começar um diagnóstico real</button></div>
+</div>
+
+<div class="shell">
+  <nav class="steps" id="steps" aria-label="Etapas"></nav>
+  <main id="main"></main>
+</div>
+
+<div id="drawer-root"></div>
+<div id="pdf-stage" aria-hidden="true"></div>
+<div id="print-area"></div>
+
+<script>
+/* =====================================================================
+   CONTEÚDO DO DIAGNÓSTICO
+   Para editar perguntas/textos, altere só esta seção.
+   peso: 1 a 3 (3 = crítico). Prioridade = peso 3 marcado como Básico;
+   Oportunidade = peso 3 marcado como Intermediário.
+   ===================================================================== */
+const PILARES = ["Financeiro","Precificação","Estoque + Perdas","Comercial","Marketing","Operacional"];
+
+const PERGUNTAS = [
+  {id:"F1",pilar:"Financeiro",peso:3,
+   q:"Como é feito o controle financeiro da empresa hoje?",
+   dig:"Se eu te perguntasse agora quanto sobrou de lucro no mês passado, você saberia responder?",
+   b:"Sem controle estruturado; mistura contas pessoais e da empresa ou só olha o saldo do banco.",
+   i:"Planilha ou sistema com entradas e saídas, mas sem DRE nem análise mensal do resultado.",
+   a:"DRE e fluxo de caixa mensais, com o resultado analisado todo mês.",
+   ponto:"Controle financeiro e visibilidade do resultado",
+   pb:"A empresa opera sem enxergar o resultado real: decisões de preço, compra e investimento são tomadas no escuro e o dinheiro some sem que se saiba onde.",
+   pi:"Existe registro, mas não análise: os números estão anotados, porém não viram decisão — o resultado real e os ralos de margem continuam invisíveis.",
+   sol:"Implantar fluxo de caixa e DRE gerencial mensal, separar pessoa física de jurídica e criar uma reunião fixa de análise de resultado."},
+  {id:"F2",pilar:"Financeiro",peso:3,
+   q:"Você sabe qual é o ponto de equilíbrio da empresa?",
+   dig:"Quanto você precisa vender por mês só para empatar? Em que dia do mês a empresa começa a lucrar?",
+   b:"Não sabe ou nunca calculou.",
+   i:"Tem uma noção aproximada, sem cálculo formal.",
+   a:"Sabe o valor exato e acompanha mês a mês.",
+   ponto:"Ponto de equilíbrio",
+   pb:"Sem conhecer o ponto de equilíbrio não existe meta mínima de vendas nem referência para saber se o mês foi bom ou ruim.",
+   pi:"A estimativa aproximada gera falsa segurança: pequenas variações de custo ou preço podem colocar a operação no prejuízo sem aviso.",
+   sol:"Levantar custos fixos e margem de contribuição, calcular o ponto de equilíbrio e transformá-lo em meta mínima semanal de vendas."},
+  {id:"F3",pilar:"Financeiro",peso:2,
+   q:"A empresa tem reserva de capital de giro? Existe endividamento?",
+   dig:"Se as vendas caíssem 30% no mês que vem, por quanto tempo a empresa aguentaria?",
+   b:"Sem reserva; usa cheque especial, cartão ou empréstimo para girar.",
+   i:"Reserva pequena (menos de 1 mês de custos) ou dívidas sob controle.",
+   a:"Reserva de 3 meses ou mais e dívidas planejadas.",
+   ponto:"Capital de giro e endividamento",
+   pb:"A operação depende de crédito caro para girar: parte do lucro vai embora em juros e qualquer mês ruim vira crise.",
+   pi:"A margem de segurança é curta: um imprevisto ou a sazonalidade podem travar compras e investimentos.",
+   sol:"Definir um percentual fixo do faturamento para formar caixa, renegociar as dívidas mais caras e projetar a necessidade de capital de giro."},
+  {id:"P1",pilar:"Precificação",peso:3,
+   q:"Como você define o preço dos seus produtos ou serviços?",
+   dig:"Você sabe qual é a margem real de cada um dos seus 5 itens mais vendidos?",
+   b:"Copia o concorrente ou define \"no feeling\".",
+   i:"Custo + margem fixa, sem considerar impostos, taxas e despesas.",
+   a:"Formação completa (custo, impostos, despesas e margem), revisada periodicamente.",
+   ponto:"Formação de preço",
+   pb:"Preço sem base de custo: é possível estar vendendo muito e lucrando pouco — ou até pagando para vender alguns itens.",
+   pi:"O markup simplificado ignora impostos, taxas e despesas fixas, e isso corrói a margem sem aparecer no caixa.",
+   sol:"Refazer a formação de preço com markup completo, identificar itens com margem negativa e ajustar a tabela."},
+  {id:"P2",pilar:"Precificação",peso:2,
+   q:"Quais são os produtos carro-chefe e qual é o ticket médio?",
+   dig:"Os produtos que mais vendem são também os que mais dão lucro?",
+   b:"Não sabe o ticket médio nem quais itens trazem mais resultado.",
+   i:"Sabe os mais vendidos, mas não cruza com a margem.",
+   a:"Conhece ticket médio, curva ABC e margem por item.",
+   ponto:"Mix de produtos e ticket médio",
+   pb:"Sem conhecer ticket médio e mix não há como planejar crescimento nem estratégias de venda adicional.",
+   pi:"O foco está no volume, não na margem: o esforço comercial pode estar empurrando os itens menos rentáveis.",
+   sol:"Montar a curva ABC de faturamento × margem e criar ações para aumentar o ticket (combos, venda adicional, kits)."},
+  {id:"E1",pilar:"Estoque + Perdas",peso:2,
+   q:"Como funciona o controle de estoque hoje?",
+   dig:"Quantas vezes no último mês faltou algo que o cliente queria — ou sobrou algo parado?",
+   b:"Sem controle; compra quando acaba.",
+   i:"Controle parcial, com inventário esporádico.",
+   a:"Sistema com estoque mínimo e máximo e compra baseada no giro.",
+   ponto:"Controle de estoque e compras",
+   pb:"Compras no improviso geram falta (venda perdida) e excesso (dinheiro parado) ao mesmo tempo.",
+   pi:"O controle existe, mas não orienta a compra: o capital fica empatado em itens de baixo giro.",
+   sol:"Definir estoque mínimo e máximo por item, fazer inventário rotativo e comprar orientado pela curva ABC."},
+  {id:"E2",pilar:"Estoque + Perdas",peso:2,
+   q:"Você mede as perdas (validade, quebra, furto, erro)?",
+   dig:"Se somasse tudo o que foi jogado fora ou sumiu no último ano, quanto daria?",
+   b:"Não mede.",
+   i:"Percebe as perdas, mas não quantifica.",
+   a:"Mede o % sobre o faturamento e age sobre as causas.",
+   ponto:"Controle de perdas",
+   pb:"Perdas invisíveis saem direto do lucro — e o que não é medido não é combatido.",
+   pi:"Sem número, a perda vira \"custo normal\" e nunca é tratada como prioridade.",
+   sol:"Registrar perdas por tipo e setor, definir uma meta de % de perda e um plano de ação para cada causa."},
+  {id:"C1",pilar:"Comercial",peso:3,
+   q:"Existe meta de vendas? Você acompanha os números (clientes, conversão, ticket)?",
+   dig:"Hoje, no meio do mês, você sabe se vai bater a meta?",
+   b:"Sem meta definida.",
+   i:"Meta de faturamento, sem acompanhar os indicadores que levam a ela.",
+   a:"Meta desdobrada em indicadores, acompanhada toda semana.",
+   ponto:"Metas e indicadores comerciais",
+   pb:"Sem meta não há ritmo nem cobrança: o resultado depende do mês \"ser bom\".",
+   pi:"A meta existe, mas sem indicadores de processo só se descobre que não bateu quando o mês já acabou.",
+   sol:"Desdobrar a meta em indicadores (contatos, conversão, ticket) e criar uma rotina semanal de acompanhamento."},
+  {id:"C2",pilar:"Comercial",peso:3,
+   q:"De onde vêm os novos clientes hoje? Existe geração ativa de demanda?",
+   dig:"Se a indicação e o boca a boca parassem amanhã, de onde viriam os clientes?",
+   b:"Depende de indicação e de clientes que chegam sozinhos.",
+   i:"Algumas ações ativas, sem constância nem medição.",
+   a:"Canais previsíveis (prospecção, tráfego, parcerias) com resultado medido.",
+   ponto:"Geração de demanda",
+   pb:"O crescimento depende da sorte: sem geração ativa de demanda a empresa não controla quantos clientes entram por mês.",
+   pi:"Ações pontuais geram picos e vales; sem constância não há previsibilidade de receita.",
+   sol:"Estruturar pelo menos dois canais ativos de aquisição, com meta e acompanhamento do custo por cliente."},
+  {id:"C3",pilar:"Comercial",peso:2,
+   q:"Existe um processo de vendas definido (abordagem, follow-up, CRM)?",
+   dig:"Quantos orçamentos ou contatos ficaram sem retorno no último mês?",
+   b:"Cada venda é feita do seu jeito, sem registro.",
+   i:"Algum padrão, mas sem CRM nem follow-up estruturado.",
+   a:"Processo documentado, CRM e rotina de follow-up.",
+   ponto:"Processo de vendas",
+   pb:"Oportunidades se perdem por falta de follow-up e o resultado depende de quem atende.",
+   pi:"Sem registro das negociações não se sabe onde o funil vaza nem quanto se perde em orçamentos esquecidos.",
+   sol:"Definir as etapas do funil, um roteiro de abordagem e de objeções e implantar CRM com cadência de follow-up."},
+  {id:"C4",pilar:"Comercial",peso:3,
+   q:"Existe estratégia para vender de novo a quem já é cliente (recompra, reativação, indicação)?",
+   dig:"Quantos clientes compraram uma vez e nunca mais voltaram?",
+   b:"Nenhuma ação com a base de clientes.",
+   i:"Ações esporádicas (promoção, mensagem avulsa).",
+   a:"Programa estruturado de recompra, reativação e indicação.",
+   ponto:"Relacionamento com a base",
+   pb:"A base de clientes — o ativo mais barato para vender — está sendo desperdiçada.",
+   pi:"Contato esporádico não cria hábito de recompra: o cliente esquece e compra do concorrente.",
+   sol:"Criar régua de relacionamento, campanha de reativação de inativos e programa formal de indicação."},
+  {id:"M1",pilar:"Marketing",peso:2,
+   q:"Como a empresa se posiciona e se diferencia dos concorrentes?",
+   dig:"Por que um cliente deveria comprar de você e não do concorrente mais próximo?",
+   b:"Não tem diferencial claro; compete por preço.",
+   i:"Sabe qual é o diferencial, mas não o comunica bem.",
+   a:"Posicionamento claro, público definido e comunicado em todos os canais.",
+   ponto:"Posicionamento e diferencial",
+   pb:"Sem diferencial percebido a única arma é o preço — o que achata a margem.",
+   pi:"O diferencial existe, mas o cliente não o percebe; a empresa continua sendo comparada por preço.",
+   sol:"Definir público-alvo e proposta de valor e aplicá-los em todos os pontos de contato (redes, loja, atendimento)."},
+  {id:"M2",pilar:"Marketing",peso:2,
+   q:"Como estão as redes sociais, o Google Meu Negócio e o investimento em marketing?",
+   dig:"Quantos clientes você consegue dizer que vieram do Instagram ou do Google no último mês?",
+   b:"Presença abandonada ou inexistente; nenhum investimento.",
+   i:"Posta sem frequência nem estratégia; investe sem medir o retorno.",
+   a:"Calendário de conteúdo, verba definida e retorno medido.",
+   ponto:"Presença digital e investimento em marketing",
+   pb:"O cliente pesquisa antes de comprar — e hoje não encontra a empresa, ou encontra uma vitrine abandonada.",
+   pi:"Existe esforço, mas sem estratégia e medição não dá para saber o que traz venda.",
+   sol:"Otimizar o Google Meu Negócio, criar calendário de conteúdo e definir verba de mídia com meta de retorno."},
+  {id:"O1",pilar:"Operacional",peso:3,
+   q:"Os processos são definidos e a equipe sabe o seu papel? Ou tudo passa pelo dono?",
+   dig:"Se você tirasse 15 dias de férias, a empresa funcionaria igual?",
+   b:"Tudo depende do dono; nada documentado.",
+   i:"Alguns processos claros, mas o dono ainda é o gargalo.",
+   a:"Processos documentados, papéis e checklists definidos.",
+   ponto:"Processos e dependência do dono",
+   pb:"O dono é o gargalo: o tempo que deveria ir para fazer o negócio crescer é consumido apagando incêndios.",
+   pi:"A dependência parcial do dono limita a capacidade de crescer sem perder qualidade.",
+   sol:"Mapear e documentar os processos-chave, definir responsáveis e checklists e criar uma rotina de gestão à vista."},
+  {id:"O2",pilar:"Operacional",peso:2,
+   q:"Existem erros internos que afetam a entrega ao cliente (atraso, retrabalho, reclamação)?",
+   dig:"Qual foi a última reclamação de cliente e o que a causou?",
+   b:"Erros frequentes e reclamações recorrentes.",
+   i:"Erros ocasionais, tratados caso a caso.",
+   a:"Entrega padronizada; erros raros e tratados na causa.",
+   ponto:"Qualidade da entrega",
+   pb:"Erros recorrentes geram retrabalho, custo e clientes perdidos — e reduzem as indicações.",
+   pi:"Tratar caso a caso resolve o sintoma, mas a causa volta a acontecer.",
+   sol:"Padronizar a entrega com checklists, registrar ocorrências e tratar a causa raiz."}
+];
+
+/* VAZAMENTOS: quanto de resultado a empresa perde por mês, em % do faturamento.
+   Só entram os ligados a perguntas marcadas como Básico (b) ou Intermediário (i).
+   Os % são estimativas conservadoras e podem ser ajustados na reunião. */
+const VAZAMENTOS = [
+  {k:"preco",q:"P1",t:"Preço mal formado",d:"Margem perdida em itens vendidos abaixo do custo real (impostos, taxas e despesas fora da conta).",b:4,i:2},
+  {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento com a base.",b:3,i:1.5},
+  {k:"perdas",q:"E2",t:"Perdas não medidas",d:"Validade, quebra, furto e erros que saem direto do lucro.",b:3,i:1.5},
+  {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2.5,i:1.25},
+  {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true},
+  {k:"mix",q:"P2",t:"Venda adicional não feita",d:"Ticket médio abaixo do potencial e mix menos rentável.",b:1.5,i:0.75},
+  {k:"estoque",q:"E1",t:"Estoque desorganizado",d:"Venda perdida por falta de produto e dinheiro parado em excesso.",b:1.5,i:0.75},
+  {k:"retrabalho",q:"O2",t:"Retrabalho e erros de entrega",d:"Custo de refazer, repor e perder cliente por erro interno.",b:1.5,i:0.75}
+];
+
+/* =====================================================================
+   TIPOS DE NEGÓCIO
+   Cada tipo pode: trocar textos de perguntas (por id), renomear pilares
+   e ter sua própria lista de vazamentos. O que não for trocado usa o padrão.
+   ===================================================================== */
+const SEGMENTOS = {
+  comercio:{t:"Comércio / Varejo",ex:"Loja, distribuidora, e-commerce",bem:"um comércio bem gerido"},
+  industria:{t:"Indústria / Produção",ex:"Fabrica e vende o que produz",bem:"uma indústria bem gerida"},
+  alimentacao:{t:"Alimentação",ex:"Restaurante, delivery, food service",bem:"um negócio de alimentação bem gerido"},
+  servicos:{t:"Serviços",ex:"Clínica, agência, escritório, prestador",bem:"uma empresa de serviços bem gerida"}
+};
+const PILAR_NOME = {
+  industria:{"Estoque + Perdas":"Matéria-prima + Perdas","Operacional":"Produção"},
+  alimentacao:{"Estoque + Perdas":"Insumos + Desperdício","Operacional":"Cozinha + Operação"},
+  servicos:{"Estoque + Perdas":"Capacidade + Recebimento"}
+};
+const OVR = {
+  /* ---------------- COMÉRCIO / VAREJO ---------------- */
+  comercio:{
+    P2:{q:"Você conhece a curva ABC e o giro dos produtos?",
+        dig:"Quais 20% dos produtos trazem 80% do faturamento — e quanto dinheiro está parado nos que não giram?",
+        b:"Não sabe quais produtos giram nem quais dão mais margem.",
+        i:"Sabe os mais vendidos, mas não cruza giro com margem.",
+        a:"Curva ABC de faturamento e margem, usada na compra e na exposição.",
+        ponto:"Curva ABC, giro e mix",
+        pb:"Sem curva ABC o dinheiro fica empatado em produto parado enquanto faltam os que vendem.",
+        pi:"Olhar só o volume esconde itens de baixa margem e baixo giro que consomem capital.",
+        sol:"Montar a curva ABC (faturamento × margem × giro), cortar itens parados e priorizar compra e exposição dos itens A."},
+    E1:{q:"Como funciona o controle de estoque? Existe estoque mínimo e máximo?",
+        dig:"Quantas vezes no último mês faltou um produto que o cliente pediu — e quanto está parado há mais de 90 dias?",
+        a:"Sistema com estoque mínimo e máximo, giro acompanhado e compra baseada na curva ABC.",
+        ponto:"Controle de estoque, ruptura e giro"},
+    E2:{q:"Você mede as perdas da loja (furto, avaria, validade, erro de caixa)?",
+        dig:"No último inventário, quanto deu a diferença entre o sistema e a prateleira?",
+        b:"Não mede; só percebe quando falta.",
+        i:"Faz inventário de vez em quando, mas não trata a diferença.",
+        a:"Mede o % de quebra por categoria e tem plano para cada causa.",
+        ponto:"Quebra de estoque",
+        sol:"Fazer inventário rotativo por categoria, medir a quebra em % do faturamento e atacar as maiores causas (furto, avaria, validade)."},
+    O2:{q:"Existe padrão de atendimento e de loja (abordagem, exposição, pós-venda)?",
+        dig:"Se eu entrasse hoje como cliente, cada vendedor me atenderia do mesmo jeito? Quantos clientes saem sem comprar?",
+        b:"Cada um atende do seu jeito; exposição sem critério.",
+        i:"Algum padrão, mas sem treinamento nem acompanhamento.",
+        a:"Roteiro de atendimento treinado, exposição planejada e pós-venda.",
+        ponto:"Padrão de atendimento e loja",
+        pb:"A experiência depende de quem atende: vendas se perdem dentro da loja sem ninguém perceber.",
+        pi:"O padrão existe, mas sem treino e acompanhamento não se sustenta.",
+        sol:"Definir roteiro de atendimento, treinar a equipe, planejar a exposição pela curva ABC e criar rotina de pós-venda."}
+  },
+  /* ---------------- INDÚSTRIA / PRODUÇÃO ---------------- */
+  industria:{
+    P1:{q:"Você sabe o custo de produção de cada produto?",
+        dig:"Quanto custa, exatamente, produzir uma unidade do seu produto mais vendido — com matéria-prima, mão de obra e custos da fábrica?",
+        b:"Não sabe; o preço sai de estimativa ou do mercado.",
+        i:"Conhece o custo da matéria-prima, mas não rateia mão de obra e custos indiretos.",
+        a:"Custo completo por produto (matéria-prima, mão de obra, indiretos e impostos), atualizado.",
+        ponto:"Custo de produção e formação de preço",
+        pb:"Sem custo de produção a empresa não sabe quais produtos dão lucro — pode estar crescendo justamente nos que dão prejuízo.",
+        pi:"Olhar só a matéria-prima esconde mão de obra, energia e custos indiretos: a margem real é menor do que parece.",
+        sol:"Montar o custo por produto (ficha de produção com matéria-prima, mão de obra e rateio de indiretos) e revisar preços e mix."},
+    P2:{q:"Você sabe a margem de cada produto e quais sustentam o resultado?",
+        dig:"Se tivesse que parar de fabricar um produto amanhã, saberia qual?",
+        b:"Não sabe a margem por produto.",
+        i:"Sabe os mais vendidos, mas não a margem de contribuição de cada um.",
+        a:"Margem de contribuição por produto conhecida e usada nas decisões de mix.",
+        ponto:"Margem por produto e mix",
+        pb:"Sem margem por produto a fábrica gasta capacidade com itens que pouco contribuem para o lucro.",
+        pi:"Foco no volume, não na margem: a capacidade da fábrica pode estar indo para os produtos menos rentáveis.",
+        sol:"Cruzar margem de contribuição e volume por produto, reposicionar ou cortar itens fracos e priorizar os que mais contribuem."},
+    E1:{q:"Como é feita a gestão da matéria-prima (compra, estoque e fornecedores)?",
+        dig:"Nos últimos 3 meses a produção parou ou atrasou por falta de matéria-prima? E quanto está parado em estoque?",
+        b:"Compra quando acaba, sem estoque mínimo nem planejamento pela produção.",
+        i:"Controla o estoque, mas a compra não é planejada a partir da produção.",
+        a:"Compra planejada pela produção, estoque mínimo por item e fornecedores avaliados.",
+        ponto:"Gestão de matéria-prima",
+        pb:"Falta matéria-prima para produzir e sobra capital parado ao mesmo tempo — e compra urgente custa mais caro.",
+        pi:"Sem ligar a compra à produção, o estoque oscila entre falta e sobra.",
+        sol:"Planejar compras pela previsão de vendas e produção, definir estoque mínimo por matéria-prima e desenvolver fornecedores alternativos."},
+    E2:{q:"Você mede as perdas do processo produtivo (refugo, rendimento, sobras)?",
+        dig:"De cada 100 kg de matéria-prima que entram, quanto vira produto vendável?",
+        b:"Não mede rendimento nem refugo.",
+        i:"Percebe perdas, mas não mede por produto ou etapa.",
+        a:"Mede rendimento e refugo por produto e etapa e age nas causas.",
+        ponto:"Perdas no processo produtivo",
+        pb:"Matéria-prima que vira refugo é dinheiro jogado fora — e sem medir ninguém sabe quanto.",
+        pi:"Sem medição por etapa não dá para saber onde o processo desperdiça.",
+        sol:"Medir rendimento e refugo por produto e etapa, definir meta de perda e padronizar o processo nos pontos críticos."},
+    O1:{q:"Existe planejamento e controle da produção (PCP)?",
+        dig:"Quantas vezes no último mês a produção foi reorganizada às pressas por causa de um pedido urgente?",
+        b:"Produz conforme aparece; o dono decide tudo no dia a dia.",
+        i:"Alguma programação, mas urgências e paradas são frequentes.",
+        a:"Programação semanal, capacidade conhecida e indicadores de produtividade.",
+        ponto:"Planejamento e controle da produção (PCP)",
+        pb:"Sem PCP a fábrica vive de urgências: hora extra, parada, atraso — e o dono preso na operação.",
+        pi:"A programação existe, mas não resiste às urgências; a capacidade real não é conhecida.",
+        sol:"Implantar um PCP simples: previsão de demanda, programação semanal, capacidade por equipamento e indicadores de produtividade."},
+    O2:{q:"Existe padrão de qualidade na produção (ficha de processo, inspeção, não conformidades)?",
+        dig:"Qual foi a última devolução ou reclamação de cliente e o que a causou?",
+        b:"Sem padrão; a qualidade depende de quem produz.",
+        i:"Alguns padrões, mas sem inspeção sistemática.",
+        a:"Ficha de processo, pontos de inspeção e tratamento das não conformidades.",
+        ponto:"Qualidade e padronização da produção",
+        pb:"Qualidade instável gera retrabalho, devolução e perda de cliente.",
+        pi:"Sem inspeção sistemática, o problema só aparece quando chega no cliente.",
+        sol:"Criar ficha de processo por produto, pontos de inspeção e registro de não conformidades com análise de causa."}
+  },
+  /* ---------------- ALIMENTAÇÃO ---------------- */
+  alimentacao:{
+    P1:{q:"Existe ficha técnica de cada item, com CMV calculado?",
+        dig:"Você sabe o CMV dos seus 5 pratos mais vendidos — e qual % do faturamento vai para insumos?",
+        b:"Não tem ficha técnica; preço definido pelo concorrente ou \"no feeling\".",
+        i:"Ficha técnica de parte do cardápio, desatualizada ou sem taxas de app e embalagem.",
+        a:"Ficha técnica de todo o cardápio com CMV, taxas e embalagem, atualizada quando os insumos mudam.",
+        ponto:"Ficha técnica e CMV",
+        pb:"Sem ficha técnica ninguém sabe quanto custa cada prato: o CMV sobe junto com os insumos e o lucro some sem aviso.",
+        pi:"A ficha técnica incompleta ignora taxas de aplicativo, embalagem e reajuste de insumos — no delivery, alguns itens podem dar prejuízo.",
+        sol:"Montar ficha técnica de todo o cardápio com gramatura e CMV, incluir taxas de delivery e embalagem e revisar preços a cada reajuste de insumo."},
+    P2:{q:"Você faz engenharia de cardápio (margem × popularidade de cada item)?",
+        dig:"Os pratos que mais vendem são também os que mais dão lucro? Quantos pedidos saem sem bebida ou sobremesa?",
+        b:"Não sabe o ticket médio nem quais itens dão mais margem.",
+        i:"Sabe os mais vendidos, mas não cruza com a margem.",
+        a:"Engenharia de cardápio feita, ticket médio acompanhado e venda adicional treinada.",
+        ponto:"Engenharia de cardápio e ticket médio",
+        pb:"O cardápio empurra itens sem saber a margem, e o ticket fica abaixo do potencial.",
+        pi:"Os campeões de venda podem ser os que menos lucram — sem engenharia de cardápio isso não aparece.",
+        sol:"Fazer engenharia de cardápio (margem × popularidade), destacar os itens mais rentáveis e criar combos e sugestões de venda adicional."},
+    E1:{q:"Como funciona a compra e o estoque de insumos?",
+        dig:"Quantas vezes no último mês faltou insumo — ou algo estragou antes de ser usado?",
+        b:"Compra quando acaba, sem controle.",
+        i:"Controle parcial, inventário esporádico, sem PEPS.",
+        a:"Estoque mínimo por insumo, PEPS (primeiro que entra, primeiro que sai) e compra pelo consumo real.",
+        ponto:"Compras e estoque de insumos",
+        pb:"Compra sem controle gera falta no meio do serviço e insumo vencendo na câmara.",
+        pi:"Sem PEPS e estoque mínimo, o insumo antigo vence enquanto o novo é usado.",
+        sol:"Definir estoque mínimo por insumo, organizar a câmara por PEPS e comprar pelo consumo real calculado pela ficha técnica."},
+    E2:{q:"Você mede o desperdício (sobras, validade, erros de preparo, consumo interno)?",
+        dig:"Numa semana normal, quanto vai para o lixo? E quanto a equipe consome sem registro?",
+        b:"Não mede.",
+        i:"Percebe o desperdício, mas não quantifica.",
+        a:"Registra desperdício por tipo e ajusta a produção à demanda.",
+        ponto:"Controle de desperdício",
+        pb:"Desperdício invisível sai direto do CMV — e o que não é medido não é combatido.",
+        pi:"Sem número, o desperdício vira \"custo normal\" da cozinha.",
+        sol:"Registrar o desperdício diário por tipo, ajustar a produção à demanda (pré-preparo) e controlar o consumo interno."},
+    C3:{q:"Como estão os canais de pedido (salão, delivery próprio, apps, reservas)?",
+        dig:"Quanto do faturamento vem de aplicativo — e quanto das taxas fica com eles?",
+        b:"Depende de um canal só (geralmente o app), sem medir o resultado por canal.",
+        i:"Tem mais de um canal, mas não mede a margem de cada um.",
+        a:"Canais próprios ativos (WhatsApp, cardápio digital) e margem medida por canal.",
+        ponto:"Canais de pedido e dependência de apps",
+        pb:"Depender do aplicativo entrega a margem e os dados do cliente para a plataforma.",
+        pi:"Sem margem por canal, a empresa pode estar crescendo justamente no canal que menos lucra.",
+        sol:"Medir margem por canal, fortalecer o pedido direto (WhatsApp, cardápio digital) e migrar clientes recorrentes do app para o canal próprio."},
+    M2:{q:"Como estão as avaliações e a presença no Google, Instagram e apps?",
+        dig:"Qual é a sua nota no Google e no iFood — e alguém responde as avaliações?",
+        b:"Não acompanha avaliações; perfis desatualizados.",
+        i:"Posta e olha as avaliações, mas sem frequência nem resposta.",
+        a:"Perfis atualizados, avaliações respondidas e conteúdo frequente com fotos dos pratos.",
+        ponto:"Reputação e presença digital",
+        pb:"Nota baixa ou perfil abandonado faz o cliente escolher o concorrente antes mesmo de provar.",
+        pi:"Sem responder avaliações e sem constância, a reputação fica à mercê do último cliente insatisfeito.",
+        sol:"Otimizar Google Meu Negócio e perfis dos apps, responder todas as avaliações e criar um calendário de conteúdo com fotos dos pratos."},
+    O1:{q:"Os processos da cozinha e do atendimento são definidos? Ou tudo passa pelo dono?",
+        dig:"Se você ficasse 15 dias fora, os pratos sairiam iguais e o caixa fecharia certo?"},
+    O2:{q:"O preparo é padronizado e o tempo de entrega é controlado?",
+        dig:"Quanto tempo leva, em média, do pedido ao prato na mesa ou na porta do cliente? Quantos pedidos voltam?",
+        b:"Cada cozinheiro faz do seu jeito; o tempo não é medido.",
+        i:"Receitas padronizadas em parte; tempo medido só às vezes.",
+        a:"Receitas com gramatura e foto de montagem, tempo de preparo e entrega medidos.",
+        ponto:"Padronização do preparo e tempo de entrega",
+        pb:"Prato diferente a cada dia e atraso na entrega derrubam a avaliação e a recompra.",
+        pi:"Sem padrão completo, a qualidade oscila conforme o turno e a equipe.",
+        sol:"Padronizar receitas (gramatura, foto, montagem), medir tempo de preparo e entrega e tratar as reclamações na causa."}
+  },
+  /* ---------------- SERVIÇOS ---------------- */
+  servicos:{
+    P1:{q:"Você sabe o custo da sua hora e precifica a partir dele?",
+        dig:"Quanto custa uma hora da sua equipe — e quanto sobra em cada contrato?",
+        b:"Copia o mercado ou define \"no feeling\".",
+        i:"Custo da hora + margem, sem considerar impostos, horas não faturáveis e despesas.",
+        a:"Preço por hora ou projeto com todos os custos, revisado periodicamente.",
+        ponto:"Custo da hora e precificação",
+        pb:"Preço sem base de custo: contratos podem estar dando prejuízo sem que ninguém perceba.",
+        pi:"O cálculo simplificado ignora impostos, horas não faturáveis e despesas fixas, corroendo a margem.",
+        sol:"Calcular o custo real da hora, refazer a precificação por serviço ou projeto e identificar contratos com margem negativa."},
+    P2:{q:"Quais serviços dão mais margem? Existem pacotes ou planos recorrentes?",
+        dig:"Qual serviço você venderia mais se pudesse escolher — e por quê?",
+        b:"Não sabe a margem por serviço; tudo é vendido avulso.",
+        i:"Sabe os mais vendidos, mas não a margem; poucos pacotes.",
+        a:"Margem por serviço conhecida, pacotes e planos recorrentes estruturados.",
+        ponto:"Portfólio de serviços e recorrência",
+        pb:"Vender tudo avulso e sem saber a margem deixa a receita imprevisível e o esforço mal pago.",
+        pi:"Sem margem por serviço, a agenda pode estar cheia justamente dos serviços que menos lucram.",
+        sol:"Mapear a margem por serviço e criar pacotes, planos recorrentes e serviços complementares para aumentar o ticket e a previsibilidade."},
+    E1:{q:"Quanto da capacidade da equipe vira hora faturada?",
+        dig:"Nesta semana, quantas horas da equipe foram gastas em algo que o cliente não paga?",
+        b:"Não mede; agenda com buracos ou equipe sobrecarregada sem controle.",
+        i:"Tem noção da agenda, mas não mede a ocupação nem as horas não faturadas.",
+        a:"Mede ocupação e horas faturáveis e planeja a capacidade.",
+        ponto:"Ocupação e capacidade da equipe",
+        pb:"Sem medir a ocupação, a empresa paga por horas que não viram receita — ou recusa clientes por falta de organização.",
+        pi:"A agenda é gerida no feeling: horas ociosas e retrabalho não aparecem como custo.",
+        sol:"Medir a taxa de ocupação e as horas faturáveis por pessoa, organizar a agenda e definir a capacidade máxima de atendimento."},
+    E2:{q:"Existe trabalho extra sem cobrança ou clientes que não pagam em dia?",
+        dig:"Quanto está em aberto hoje com clientes atrasados? Quantas vezes no mês você faz \"um favor\" fora do combinado?",
+        b:"Faz extras sem cobrar e não controla a inadimplência.",
+        i:"Cobra os atrasos, mas o escopo extra ainda escapa.",
+        a:"Escopo em contrato, extras cobrados e régua de cobrança ativa.",
+        ponto:"Escopo e inadimplência",
+        pb:"Trabalho entregue e não recebido é custo integral sem nenhuma receita.",
+        pi:"Parte do problema está sob controle, mas o escopo extra e os atrasos ainda consomem a margem.",
+        sol:"Formalizar o escopo em contrato, cobrar aditivos e implantar uma régua de cobrança com prazos e responsáveis."},
+    C3:{q:"Existe um processo comercial definido (proposta, follow-up, CRM)?",
+        dig:"Quantas propostas enviadas no último mês ficaram sem resposta?",
+        ponto:"Processo comercial e propostas"},
+    C4:{q:"Existe estratégia para manter e renovar clientes (recorrência, renovação, indicação)?",
+        dig:"Quantos clientes cancelaram ou deixaram de renovar no último ano?",
+        b:"Nenhuma ação; o cliente só volta se lembrar.",
+        i:"Contato esporádico perto da renovação.",
+        a:"Contratos recorrentes, renovação ativa e programa de indicação.",
+        ponto:"Retenção e renovação",
+        pb:"Cada cliente que não renova precisa ser substituído por um novo — o que custa muito mais caro.",
+        pi:"Sem rotina de relacionamento, a renovação depende do cliente lembrar da empresa.",
+        sol:"Criar planos recorrentes, rotina de renovação antes do vencimento e programa formal de indicação."},
+    M2:{q:"Como a empresa é encontrada (Google, Instagram, LinkedIn, conteúdo)?",
+        dig:"Quantos clientes novos vieram do digital no último trimestre?",
+        sol:"Otimizar Google Meu Negócio e perfis, produzir conteúdo que mostre autoridade (casos, antes e depois) e definir verba de mídia com meta de retorno."},
+    O2:{q:"A entrega do serviço é padronizada (escopo, checklist, prazos)?",
+        dig:"Qual foi a última reclamação de cliente e o que a causou?",
+        b:"Cada profissional entrega do seu jeito; prazos estouram.",
+        i:"Algum padrão, mas sem checklist nem controle de prazo.",
+        a:"Entrega padronizada com checklist, prazos definidos e pesquisa de satisfação.",
+        ponto:"Padronização da entrega",
+        pb:"Entrega inconsistente gera retrabalho, atraso e cliente insatisfeito — e acaba com a indicação.",
+        pi:"Sem checklist e prazos, a qualidade depende de quem executa.",
+        sol:"Padronizar a entrega com checklist por serviço, prazos definidos e pesquisa de satisfação ao final."}
+  }
+};
+const VAZ_SEG = {
+  comercio:[
+    {k:"preco",q:"P1",t:"Preço mal formado",d:"Margem perdida em itens vendidos abaixo do custo real (impostos, taxas e despesas fora da conta).",b:4,i:2},
+    {k:"perdas",q:"E2",t:"Quebra de estoque",d:"Furto, avaria, validade e erros de caixa que saem direto do lucro.",b:3,i:1.5},
+    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento com a base.",b:3,i:1.5},
+    {k:"estoque",q:"E1",t:"Ruptura e estoque parado",d:"Venda perdida por falta de produto e dinheiro parado no que não gira.",b:2,i:1},
+    {k:"atendimento",q:"O2",t:"Vendas perdidas no atendimento",d:"Clientes que entram e saem sem comprar por falta de padrão de atendimento.",b:2,i:1},
+    {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2,i:1},
+    {k:"mix",q:"P2",t:"Mix e giro mal geridos",d:"Capital em itens de baixa margem e baixo giro.",b:1.5,i:0.75},
+    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
+  ],
+  industria:[
+    {k:"preco",q:"P1",t:"Custo de produção desconhecido",d:"Produtos vendidos abaixo do custo real de fabricação.",b:4,i:2},
+    {k:"perdas",q:"E2",t:"Refugo e perda de rendimento",d:"Matéria-prima que entra e não vira produto vendável.",b:3,i:1.5},
+    {k:"pcp",q:"O1",t:"Produção sem planejamento",d:"Hora extra, paradas e urgências que encarecem a produção.",b:2.5,i:1.25},
+    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra e pedidos recorrentes que deixam de acontecer.",b:2.5,i:1.25},
+    {k:"materia",q:"E1",t:"Matéria-prima mal gerida",d:"Compra urgente mais cara, parada por falta e capital parado em estoque.",b:2,i:1},
+    {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Pedidos que se perdem por falta de follow-up.",b:2,i:1},
+    {k:"retrabalho",q:"O2",t:"Retrabalho e devoluções",d:"Custo de refazer, repor e perder cliente por falha de qualidade.",b:1.5,i:0.75},
+    {k:"mix",q:"P2",t:"Mix com produtos de baixa margem",d:"Capacidade da fábrica gasta com itens que pouco contribuem.",b:1.5,i:0.75},
+    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
+  ],
+  alimentacao:[
+    {k:"perdas",q:"E2",t:"Desperdício",d:"Sobras, validade, erros de preparo e consumo interno que saem direto do CMV.",b:5,i:2.5},
+    {k:"preco",q:"P1",t:"CMV fora de controle",d:"Itens sem ficha técnica vendidos abaixo do custo real (insumos, taxas de app, embalagem).",b:4,i:2},
+    {k:"canais",q:"C3",t:"Taxas de app e canais mal geridos",d:"Margem que fica com as plataformas por falta de canal próprio.",b:2.5,i:1.25},
+    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento.",b:2.5,i:1.25},
+    {k:"estoque",q:"E1",t:"Compras sem controle",d:"Insumo que falta no serviço ou vence na câmara.",b:2,i:1},
+    {k:"mix",q:"P2",t:"Cardápio e venda adicional",d:"Pedidos sem bebida, sobremesa ou combo e itens de baixa margem em destaque.",b:1.5,i:0.75},
+    {k:"retrabalho",q:"O2",t:"Erros de preparo e atrasos",d:"Pratos refeitos, pedidos devolvidos e reembolsos.",b:1.5,i:0.75},
+    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
+  ],
+  servicos:[
+    {k:"ociosidade",q:"E1",t:"Horas ociosas",d:"Horas da equipe pagas e não faturadas.",b:5,i:2.5},
+    {k:"escopo",q:"E2",t:"Escopo não cobrado e inadimplência",d:"Trabalho entregue sem cobrança e valores que não foram recebidos.",b:4,i:2},
+    {k:"preco",q:"P1",t:"Preço abaixo do custo real da hora",d:"Contratos com margem baixa ou negativa sem ninguém perceber.",b:4,i:2},
+    {k:"clientes",q:"C4",t:"Clientes que cancelam ou não renovam",d:"Receita recorrente perdida por falta de rotina de retenção.",b:4,i:2},
+    {k:"followup",q:"C3",t:"Propostas sem retorno",d:"Negociações que esfriam por falta de follow-up.",b:3,i:1.5},
+    {k:"retrabalho",q:"O2",t:"Retrabalho na entrega",d:"Horas gastas refazendo trabalho que o cliente não paga.",b:2,i:1},
+    {k:"mix",q:"P2",t:"Serviços complementares não vendidos",d:"Ticket abaixo do potencial por falta de pacotes e recorrência.",b:1.5,i:0.75},
+    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
+  ]
+};
+const tipoDe=s=>s.empresa.tipo||"comercio";
+/* Margem líquida de referência (% do faturamento) de uma empresa bem gerida em cada tipo de negócio. Editável na reunião. */
+const MARGEM_REF = {comercio:10,industria:15,alimentacao:12,servicos:20};
+const PL=(s,p)=>(PILAR_NOME[tipoDe(s)]||{})[p]||p;
+function qsDe(s){const o=OVR[tipoDe(s)]||{}; return PERGUNTAS.map(q=>({...q,...(o[q.id]||{}),pilarNome:PL(s,q.pilar)}));}
+const vazDe=s=>VAZ_SEG[tipoDe(s)]||VAZAMENTOS;
+
+const CANAIS = ["Indicação / boca a boca","Loja física","Instagram / redes sociais","WhatsApp","Google / site","Marketplace / apps de entrega","Prospecção ativa","Representantes / revenda","Parcerias","Tráfego pago"];
+const TEMPOS = [{v:6,t:"Cerca de 6 meses"},{v:12,t:"Cerca de 1 ano"},{v:24,t:"Cerca de 2 anos"},{v:36,t:"3 anos ou mais"}];
+const RESULTADO = [{v:"lucro",t:"Sobra (lucro)"},{v:"prejuizo",t:"Falta (prejuízo)"},{v:"naosei",t:"Não sabe"}];
+
+/* Dor e urgência: opções para clicar, escritas do jeito que o cliente fala. */
+const DOR = [
+  {k:"impediu",multi:true,t:"O que trava o crescimento",q:"Na sua visão, o que impediu a empresa de já estar em outro patamar?",
+   op:["Falta de tempo — o dono preso na operação","Não conhecer os números do negócio","Falta de gente boa na equipe","Vendas fracas ou irregulares","Margem apertada — vende, mas não sobra","Concorrência e guerra de preço","Falta de processos e organização","Falta de capital / dívidas"]},
+  {k:"tentou",multi:true,t:"O que já foi tentado",q:"O que já foi tentado e não deu certo?",
+   op:["Contratar vendedor","Anúncios e impulsionamento nas redes","Agência de marketing","Sistema de gestão (ERP)","Outra consultoria","Promoções e descontos","Contratar gerente","Ainda não tentou nada estruturado"]},
+  {k:"preocupa",multi:false,t:"O que mais preocupa",q:"De todos os desafios, qual mais te preocupa hoje?",
+   op:["Trabalhar muito e não sobrar dinheiro","O caixa apertado para pagar as contas","As vendas caindo ou instáveis","A empresa depender de mim para tudo","Perder clientes para a concorrência","Não conseguir fazer a empresa crescer","A equipe — rotatividade e falta de comprometimento"]},
+  {k:"seNada",multi:false,t:"Se nada mudar em 6 meses",q:"Se nada mudar nos próximos 6 meses, o que acontece com a empresa — e com você?",
+   op:["Continua como está — e isso já é ruim","Piora: perde margem e clientes","Vai precisar de crédito para se manter","Pode ter que fechar uma unidade ou operação","Esgotamento pessoal — o ritmo não se sustenta"]}
+];
+const CARGOS = ["Sócio / fundador","Diretor","Gerente","Outro"];
+const PORTES = ["Só o dono","1 a 5","6 a 20","21 a 50","51 a 100","Mais de 100"];
+const SUBSEG = {
+  comercio:["Supermercado / mercearia","Moda e vestuário","Materiais de construção","Farmácia / saúde","Distribuidora / atacado","E-commerce","Outro varejo"],
+  industria:["Alimentos e bebidas","Têxtil / confecção","Metalmecânica","Móveis / madeira","Químicos / cosméticos","Gráfica / embalagens","Outra indústria"],
+  alimentacao:["Restaurante","Lanchonete / hamburgueria","Pizzaria","Padaria / confeitaria","Cafeteria","Delivery / dark kitchen","Bar"],
+  servicos:["Saúde / clínica","Estética / beleza","Agência / marketing","Contabilidade / jurídico","Tecnologia","Educação / cursos","Construção / reformas","Outro serviço"]
+};
+const PROX_ACOES = ["Apresentação do plano de ação","Envio de proposta","Reunião com os sócios","Diagnóstico aprofundado na empresa"];
+const PROX_PRAZOS = ["Em até 2 dias","Esta semana","Próxima semana","Em até 15 dias"];
+const consultorSalvo=()=>{try{return localStorage.getItem("berry-consultor")||""}catch(e){return ""}};
+
+/* ===================================================================== */
+const NIVEL = {b:{t:"Básico",p:1},i:{t:"Intermediário",p:2},a:{t:"Avançado",p:3}};
+const STEPS = [
+  {t:"Empresa",s:"Quem é o cliente"},
+  {t:"Diagnóstico",s:"15 perguntas"},
+  {t:"Quanto está perdendo",s:"Resultado deixado na mesa"},
+  {t:"Dor e urgência",s:"Nas palavras do cliente"},
+  {t:"Resultado",s:"Documento para o cliente"}
+];
+
+function blank(){
+  return {id:"d"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString(),exemplo:false,
+    empresa:{nome:"",tipo:null,segmento:"",decisor:"",cargo:"",funcionarios:"",canais:[],consultor:consultorSalvo()},
+    numeros:{fat:null,resTipo:null,resultado:null,juros:null,margemRef:null,tempo:null},
+    vaz:{},respostas:{},dor:{impediu:"",tentou:"",preocupa:"",seNada:"",prioridade:null},
+    parecer:{texto:"",proximo:"",acao:null,prazo:null}};
+}
+function exemplo(){
+  const s=blank(); s.id="exemplo"; s.exemplo=true;
+  s.empresa={nome:"Panificadora Muriel",tipo:"industria",segmento:"Alimentos e bebidas",decisor:"Muriel",cargo:"Sócio / fundador",funcionarios:"6 a 20",canais:["Loja física","Indicação / boca a boca","WhatsApp"],consultor:"Consultor Berry"};
+  s.numeros={fat:25000,resTipo:"lucro",resultado:1500,juros:600,margemRef:null,tempo:12};
+  const r={F1:"i",F2:"b",F3:"b",P1:"b",P2:"i",E1:"i",E2:"b",C1:"b",C2:"b",C3:"i",C4:"b",M1:"i",M2:"b",O1:"b",O2:"a"};
+  for(const k in r) s.respostas[k]={n:r[k]};
+  s.dor={impediu:"Não consigo sair da produção para vender. Fico o dia inteiro no forno.",tentou:"Já paguei impulsionamento no Instagram, mas não vi retorno e parei.",
+    preocupa:"Trabalho muito e no fim do mês não sobra quase nada.",seNada:"Vou continuar esgotada e posso ter que fechar uma das frentes de venda.",prioridade:9};
+  s.parecer={texto:"",proximo:"",acao:"Apresentação do plano de ação",prazo:"Próxima semana"};
+  return s;
+}
+
+/* ---------- cálculos ---------- */
+function scoreOf(qs,resp){
+  let pts=0,max=0;
+  for(const q of qs){const r=resp[q.id]; if(!r||!r.n||r.n==="na")continue; pts+=NIVEL[r.n].p*q.peso; max+=3*q.peso;}
+  return max?pts/max:null;
+}
+function calc(s){
+  const QS=qsDe(s);
+  const geral=scoreOf(QS,s.respostas);
+  const nota=geral==null?null:geral*10;
+  const pilares=PILARES.map(p=>({key:p,p:PL(s,p),v:scoreOf(QS.filter(q=>q.pilar===p),s.respostas)}));
+  const aval=pilares.filter(x=>x.v!=null);
+  const melhor=aval.length?aval.reduce((a,b)=>b.v>a.v?b:a):null;
+  const pior=aval.length?aval.reduce((a,b)=>b.v<a.v?b:a):null;
+  const crit=[];
+  for(const q of QS){const r=s.respostas[q.id]; if(!r||(r.n!=="b"&&r.n!=="i"))continue;
+    let tipo; if(q.peso===3&&r.n==="b")tipo="Prioridade"; else if(q.peso===3&&r.n==="i")tipo="Oportunidade"; else tipo="Atenção";
+    crit.push({q,n:r.n,tipo,rank:(tipo==="Prioridade"?0:tipo==="Oportunidade"?1:2)*10+(r.n==="b"?0:1)});}
+  crit.sort((a,b)=>a.rank-b.rank);
+  const n=s.numeros, fat=n.fat;
+  /* 1) Tetos: quanto cada problema identificado pode estar custando, em % do faturamento */
+  const vaz=[];
+  for(const v of vazDe(s)){
+    const r=s.respostas[v.q]; if(!r||(r.n!=="b"&&r.n!=="i"))continue;
+    let p, fixo=false;
+    if(v.money&&n.juros!=null&&fat){p=n.juros/fat*100; fixo=true;}
+    else p=(s.vaz&&s.vaz[v.k]!=null)?s.vaz[v.k]:v[r.n];
+    vaz.push({...v,n:r.n,p,fixo,padrao:v[r.n],teto:fat?fat*p/100:null,valor:null});
+  }
+  vaz.sort((a,b)=>b.p-a.p);
+  const tetoTotal=fat?vaz.reduce((a,x)=>a+x.teto,0):null;
+  /* 2) Lucro atual × lucro de referência do segmento */
+  const lucro=n.resTipo==="lucro"&&n.resultado!=null?n.resultado:n.resTipo==="prejuizo"&&n.resultado!=null?-n.resultado:null;
+  const refPct=n.margemRef!=null?n.margemRef:MARGEM_REF[tipoDe(s)];
+  const lucroRef=fat?fat*refPct/100:null;
+  let modo=null, perda=null, outros=0, extra=null;
+  if(fat&&lucro==null){ /* não sabe o lucro: estimativa pelos problemas do diagnóstico */
+    modo="estimativa"; perda=tetoTotal; vaz.forEach(v=>v.valor=v.teto);
+  }else if(fat){
+    const gap=lucroRef-lucro;
+    if(gap<=0){ modo="saudavel"; perda=0; extra=tetoTotal; vaz.forEach(v=>v.valor=0); }
+    else{
+      /* 3) Distribui a diferença: valores informados primeiro, estimados em proporção ao teto; o que passar dos tetos vai para "outros" */
+      modo="margem"; perda=gap; let rest=gap;
+      vaz.filter(v=>v.fixo).forEach(v=>{v.valor=Math.min(v.teto,rest); rest-=v.valor;});
+      const est=vaz.filter(v=>!v.fixo), E=est.reduce((a,v)=>a+v.teto,0);
+      if(rest>=E){ est.forEach(v=>v.valor=v.teto); outros=rest-E; }
+      else est.forEach(v=>v.valor=E?v.teto*rest/E:0);
+    }
+  }
+  const margem=(lucro!=null&&fat)?lucro/fat:null;
+  const lucroPot=(lucro!=null&&perda!=null)?lucro+perda:null;
+  const respondidas=QS.filter(q=>s.respostas[q.id]&&s.respostas[q.id].n).length;
+  return {nota,mat:maturidade(nota),pilares,melhor,pior,crit,
+    prior:crit.filter(c=>c.tipo==="Prioridade").length,oport:crit.filter(c=>c.tipo==="Oportunidade").length,
+    vaz,modo,perda,outros,extra,tetoTotal,refPct,lucroRef,
+    perdaAno:perda!=null?perda*12:null,acum:(perda!=null&&n.tempo)?perda*n.tempo:null,
+    lucro,margem,lucroPot,margemPot:(lucroPot!=null&&fat)?lucroPot/fat:null,
+    porReal:(lucro>0&&perda)?perda/lucro:null,
+    potencial:nota?(10-nota)/nota:null,respondidas};
+}
+function maturidade(n){if(n==null)return null; if(n<5)return {k:"b",t:"Básico"}; if(n<8)return {k:"i",t:"Intermediário"}; return {k:"a",t:"Avançado"};}
+function lvlKey(v){return v==null?null:v<.5?"b":v<.8?"i":"a";}
+
+/* ---------- formatação ---------- */
+const brl=v=>v==null?"—":v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+const pct=v=>v==null?"—":(v*100).toLocaleString("pt-BR",{maximumFractionDigits:0})+"%";
+const dec=v=>v==null?"—":v.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const pct1=v=>v==null?"—":(v*100).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+const numBR=v=>v==null?"":v.toLocaleString("pt-BR",{maximumFractionDigits:2});
+const parseNum=s=>{let t=String(s).trim(); if(t.includes(","))t=t.replace(/\./g,"").replace(",","."); t=t.replace(/[^\d.]/g,""); return t===""||isNaN(+t)?null:+t;};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const parseMoney=s=>{const d=String(s).replace(/\D/g,""); return d?parseInt(d,10):null;};
+const fmtMoneyInput=v=>v==null?"":v.toLocaleString("pt-BR");
+const dataBR=iso=>new Date(iso).toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+const LOGO=`<svg viewBox="170 150 460 490" aria-hidden="true"><g fill="none" stroke-width="54"><circle cx="290" cy="272" r="86" stroke="#0D30A4"/><circle cx="290" cy="524" r="86" stroke="#0D30A4"/><circle cx="508" cy="398" r="86" stroke="#47C97E"/></g></svg>`;
+
+/* ---------- armazenamento (localStorage localmente; banco compartilhado quando publicado) ---------- */
+const LS_KEY="berry-diagnosticos-v1", LS_CUR="berry-diagnostico-atual";
+const localStore={
+  kind:"local",
+  _all(){try{return JSON.parse(localStorage.getItem(LS_KEY)||"{}")}catch(e){return {}}},
+  async list(){return Object.values(this._all())},
+  ok:true,
+  async save(s){try{const a=this._all(); a[s.id]=s; localStorage.setItem(LS_KEY,JSON.stringify(a)); this.ok=true;}catch(e){this.ok=false;}},
+  async remove(id){try{const a=this._all(); delete a[id]; localStorage.setItem(LS_KEY,JSON.stringify(a))}catch(e){}}
+};
+function dbStore(db){
+  let chain=Promise.resolve();
+  return {kind:"db",
+    async list(){const snap=await db.collection("diagnosticos").get(); return snap.docs.map(d=>d.data()).filter(Boolean);},
+    save(s){const copy=JSON.parse(JSON.stringify(s)); const p=chain.then(()=>db.doc("diagnosticos/"+s.id).set(copy)); chain=p.catch(()=>{}); return p;},
+    async remove(id){await db.doc("diagnosticos/"+id).delete();}};
+}
+let store=localStore;
+const inArtifact=()=>!!(window.claude&&typeof window.claude.use==="function");
+const useCap=(name,ms=6000)=>inArtifact()?Promise.race([window.claude.use(name).catch(()=>null),new Promise(r=>setTimeout(()=>r(null),ms))]):Promise.resolve(null);
+
+/* ---------- estado ---------- */
+let S=exemplo(), step=0, saveTimer=null, openNotes=new Set();
+function setCurrent(id){try{localStorage.setItem(LS_CUR,id)}catch(e){}}
+/* Onde o diagnóstico ficou salvo: "time" (histórico compartilhado), "local" (só este navegador) ou "erro". */
+let ondeSalvo=null;
+async function salvarAgora(){
+  const snap=S;
+  if(store.kind==="db"){
+    try{await store.save(snap); ondeSalvo="time"; await localStore.remove(snap.id); setStatus(); return;}
+    catch(e){ /* sem permissão de gravar no histórico do time (ou falha momentânea): guarda no navegador */ }
+  }
+  await localStore.save(snap);
+  ondeSalvo=localStore.ok?"local":"erro"; setStatus();
+}
+function touch(){
+  if(S.exemplo){ /* editou o exemplo: vira um diagnóstico real, para não perder o que foi preenchido */
+    const id=blank().id; S.exemplo=false; S.id=id; S.criadoEm=new Date().toISOString(); setCurrent(id);
+  }
+  S.atualizadoEm=new Date().toISOString();
+  setStatus("Salvando…");
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(salvarAgora,600);
+  updateChrome();
+}
+function setStatus(t){
+  const el=document.getElementById("save-status");
+  const txt=S.exemplo?"Exemplo — não salvo":t?t:ondeSalvo==="time"?"Salvo no histórico do time":ondeSalvo==="local"?"Salvo só neste navegador":ondeSalvo==="erro"?"Não foi possível salvar":"Salvo";
+  el.classList.toggle("ex",S.exemplo||ondeSalvo==="local"); el.classList.toggle("err",ondeSalvo==="erro"&&!S.exemplo);
+  el.title=ondeSalvo==="local"?"Sua conta não tem permissão para gravar no histórico do time (ou você não está logado no Claude). O diagnóstico fica salvo neste navegador.":ondeSalvo==="erro"?"O navegador bloqueou o armazenamento. Baixe o PDF antes de fechar.":"";
+  el.querySelector("span").textContent=txt;
+}
+function updateChrome(){
+  const c=calc(S);
+  document.getElementById("live-score").textContent=c.nota==null?"Nota —":`Nota ${dec(c.nota)} · ${c.respondidas}/${PERGUNTAS.length}`;
+  document.getElementById("top-company").textContent=S.empresa.nome?"· "+S.empresa.nome:"";
+  document.getElementById("example-banner").hidden=!S.exemplo;
+  renderSteps(c);
+}
+function getPath(o,p){return p.split(".").reduce((a,k)=>a?.[k],o)}
+function setPath(o,p,v){const ks=p.split("."); let t=o; ks.slice(0,-1).forEach(k=>t=t[k]); t[ks.at(-1)]=v;}
+
+/* ---------- render: etapas ---------- */
+function stepDone(i,c){
+  if(i===0)return !!S.empresa.nome;
+  if(i===1)return c.respondidas===PERGUNTAS.length;
+  if(i===2)return S.numeros.fat!=null&&!!S.numeros.resTipo;
+  if(i===3)return S.dor.prioridade!=null;
+  return false;
+}
+function renderSteps(c=calc(S)){
+  document.getElementById("steps").innerHTML=STEPS.map((st,i)=>{
+    const sub=i===1?`${c.respondidas} de ${PERGUNTAS.length} respondidas`:st.s;
+    return `<button class="step ${i===step?"on":""} ${i!==step&&stepDone(i,c)?"done":""}" type="button" data-go="${i}" ${i===step?'aria-current="step"':""}>
+      <span class="n">${i!==step&&stepDone(i,c)?"✓":i+1}</span><span><span class="t">${st.t}</span><br><span class="s">${sub}</span></span></button>`}).join("");
+}
+function navRow(){
+  const prev=step>0?`<button class="btn" type="button" data-go="${step-1}">← ${STEPS[step-1].t}</button>`:"<span></span>";
+  const next=step<STEPS.length-1?`<button class="btn primary" type="button" data-go="${step+1}">${step===3?"Gerar resultado":"Próximo: "+STEPS[step+1].t} →</button>`:"";
+  return `<div class="navrow">${prev}${next}</div>`;
+}
+function render(){
+  const m=document.getElementById("main");
+  m.innerHTML=[renderEmpresa,renderDiag,renderPerdas,renderDor,renderResultado][step]();
+  updateChrome(); setStatus();
+}
+
+function inp(path,label,opt={}){
+  const v=getPath(S,path)??"";
+  const id="f-"+path.replace(/\./g,"-");
+  return `<div class="field ${opt.full?"full":""}"><label for="${id}">${label}</label>
+    <input class="inp" id="${id}" data-bind="${path}" value="${esc(v)}" placeholder="${esc(opt.ph||"")}" ${opt.type?`type="${opt.type}"`:""} autocomplete="off">
+    ${opt.help?`<small>${opt.help}</small>`:""}</div>`;
+}
+function chips(path,opts,multi){
+  const v=getPath(S,path);
+  return `<div class="chips">${opts.map(o=>`<button type="button" class="chip" ${multi?"data-multi":"data-pick"}="${path}" data-val="${esc(o)}" aria-pressed="${multi?(Array.isArray(v)&&v.includes(o)):v===o}">${esc(o)}</button>`).join("")}</div>`;
+}
+let tipoAviso=false;
+function renderEmpresa(){
+  const t=S.empresa.tipo;
+  return `<div class="head"><div class="eyebrow">Etapa 1 de 5</div><h1>Sobre a empresa</h1>
+    <p>Aquecimento rápido: só o nome é digitado, o resto é clicar.</p></div>
+  <div class="panel"><div class="grid2">
+    ${inp("empresa.nome","Nome da empresa",{ph:"Ex.: Panificadora Muriel"})}
+    ${inp("empresa.decisor","Nome do decisor",{ph:"Com quem você está falando"})}
+    <div class="field full"><span class="lbl">Tipo de negócio</span>
+      <div class="tipos">${Object.entries(SEGMENTOS).map(([k,v])=>`<button type="button" class="tipo" data-tipo="${k}" aria-pressed="${t===k}"><b>${v.t}</b><span>${v.ex}</span></button>`).join("")}</div>
+      <small>Adapta as perguntas, os textos e os vazamentos ao tipo de negócio.</small>
+      ${tipoAviso?`<div class="hint" style="color:var(--warn)">Tipo de negócio alterado com o diagnóstico já iniciado. As respostas foram mantidas, mas algumas perguntas mudaram — revise o diagnóstico.</div>`:""}</div>
+    ${t?`<div class="field full"><span class="lbl">Segmento</span>${chips("empresa.segmento",SUBSEG[t])}</div>`:""}
+    <div class="field full"><span class="lbl">Cargo do decisor</span>${chips("empresa.cargo",CARGOS)}</div>
+    <div class="field full"><span class="lbl">Tamanho da equipe</span>${chips("empresa.funcionarios",PORTES)}</div>
+    ${inp("empresa.consultor","Consultor Berry",{ph:"Seu nome",help:"Fica salvo para os próximos diagnósticos."})}
+  </div></div>${navRow()}`;
+}
+function moneyField(path,label,help){
+  const id="f-"+path.replace(/\./g,"-");
+  return `<div class="field full"><label for="${id}">${label}</label>
+    <div style="position:relative"><span class="mono" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)">R$</span>
+    <input class="inp money" id="${id}" data-money="${path}" inputmode="numeric" value="${fmtMoneyInput(getPath(S,path))}" placeholder="0" style="padding-left:40px"></div>
+    ${help?`<small>${help}</small>`:""}</div>`;
+}
+const reais=v=>v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+function gapCardHTML(){
+  const c=calc(S), n=S.numeros, seg=SEGMENTOS[tipoDe(S)].t;
+  if(!n.fat) return `<div class="gapcard"><div class="eyebrow">Resultado deixado na mesa</div>
+    <div class="muted">Preencha o faturamento mensal para calcular quanto a empresa está deixando na mesa.</div></div>`;
+  const tempoTxt=n.tempo?TEMPOS.find(t=>t.v===n.tempo)?.t.toLowerCase():null;
+  const tempoLinhas=`<div class="gapline"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>
+    ${c.acum!=null?`<div class="gapline"><span>Já perdido (${tempoTxt})</span><b>${brl(c.acum)}</b></div>`:""}`;
+  if(c.modo==="saudavel") return `<div class="gapcard"><div class="eyebrow">Margem dentro da referência</div>
+    <div class="gapbig">${pct1(c.margem)}</div>
+    <div class="muted">Sobram ${brl(c.lucro)} por mês — acima da referência de ${numBR(c.refPct)}% para ${seg}. ${c.extra?`Os problemas do diagnóstico ainda indicam até <b>${brl(c.extra)}/mês</b> de potencial adicional.`:""}</div></div>`;
+  if(c.modo==="estimativa") return `<div class="gapcard"><div class="eyebrow">Estimativa de perda mensal</div>
+    <div class="gapbig">${brl(c.perda)}</div>
+    <div class="muted">O cliente não sabe quanto sobra. Estimativa pelos problemas identificados no diagnóstico: ${pct1(c.perda/n.fat)} do faturamento.</div>
+    ${tempoLinhas}
+    <div class="gapline"><span>Quanto sobraria em ${SEGMENTOS[tipoDe(S)].bem} (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div></div>`;
+  return `<div class="gapcard"><div class="eyebrow">Deixando na mesa todo mês</div>
+    <div class="gapbig">${brl(c.perda)}</div>
+    ${c.porReal!=null?`<div class="muted">Para cada <b>R$ 1</b> que sobra hoje, <b>R$ ${reais(c.porReal)}</b> ficam na mesa.</div>`:""}
+    <div class="calc">
+      <div><span>Faturamento × margem de referência (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div>
+      <div><span>− ${c.lucro<0?"Prejuízo":"Lucro"} atual (${pct1(c.margem)})</span><b>${brl(c.lucro)}</b></div>
+      <div class="eq"><span>= Deixando na mesa</span><b>${brl(c.perda)}</b></div>
+    </div>
+    ${tempoLinhas}</div>`;
+}
+function leaksHTML(){
+  const c=calc(S);
+  if(!S.numeros.fat||(!c.vaz.length&&!c.outros)) return "";
+  const titulo=c.modo==="margem"?"De onde vem essa diferença":c.modo==="saudavel"?"Potencial adicional":"Onde o dinheiro está vazando";
+  const hint=c.modo==="margem"
+    ?`A diferença de ${brl(c.perda)} é distribuída entre os problemas do diagnóstico, na proporção do peso de cada um. O % é o <b>teto</b> que cada problema pode custar — valide com o cliente e ajuste.`
+    :c.modo==="saudavel"?"Problemas do diagnóstico que ainda podem melhorar o resultado. O % é o teto estimado de cada um."
+    :"Sem o lucro, cada problema entra pelo seu teto estimado em % do faturamento. Valide cada linha com o cliente e ajuste.";
+  return `<div class="panel" style="margin-top:20px"><div class="leaks-h"><h2 style="font-size:17px">${titulo}</h2><span class="hint">${hint}</span></div>
+    <div class="leaks"><div class="leak lk-head"><div>Problema</div><div>Teto</div><div>Por mês</div></div>
+    ${c.vaz.map(v=>`<div class="leak">
+      <div class="lk-t"><b>${esc(v.t)}</b><span>${esc(v.d)}</span><span class="lk-src"><i class="dot ${v.n}"></i>${v.q} · ${NIVEL[v.n].t}</span></div>
+      <div class="lk-p">${v.fixo?`<span class="mono" title="Calculado a partir dos juros informados">${numBR(Math.round(v.p*10)/10)}%</span><small>informado</small>`
+        :`<label class="sr" for="vz-${v.k}">Teto em % do faturamento</label><input class="inp mono" id="vz-${v.k}" data-vaz="${v.k}" inputmode="decimal" value="${numBR(v.p)}"><small>%${v.p!==v.padrao?` · <button type="button" class="linkbtn" data-vaz-reset="${v.k}">padrão ${numBR(v.padrao)}</button>`:""}</small>`}</div>
+      <div class="lk-v mono" id="vzv-${v.k}">${brl(c.modo==="saudavel"?v.teto:v.valor)}</div></div>`).join("")}
+    ${c.outros>0?`<div class="leak"><div class="lk-t"><b>Outros custos e estrutura</b><span>Parte da diferença que os problemas do diagnóstico não explicam: custos fixos, estrutura e despesas a investigar.</span></div><div class="lk-p"></div><div class="lk-v mono" id="vz-outros">${brl(c.outros)}</div></div>`:""}
+    <div class="leak total"><div class="lk-t"><b>Total por mês</b></div><div class="lk-p"></div><div class="lk-v mono" id="vz-total">${brl(c.modo==="saudavel"?c.extra:c.perda)}</div></div>
+    </div></div>`;
+}
+function renderPerdas(){
+  const n=S.numeros, t=tipoDe(S);
+  return `<div class="head"><div class="eyebrow">Etapa 3 de 5</div><h1>Quanto a empresa está deixando na mesa</h1>
+    <p>Comparamos o que sobra hoje com o que uma empresa do mesmo segmento, bem gerida, deixaria de lucro. A diferença é explicada pelos problemas que o próprio cliente acabou de reconhecer.</p></div>
+  <div class="nums">
+    <div class="panel"><div class="grid2">
+      ${moneyField("numeros.fat","Faturamento médio mensal")}
+      <div class="field full"><span class="lbl">No fim do mês, quanto sobra?</span>
+        <div class="seg">${RESULTADO.map(r=>`<button type="button" class="chip" data-restipo="${r.v}" aria-pressed="${n.resTipo===r.v}">${r.t}</button>`).join("")}</div>
+        ${n.resTipo==="naosei"?`<small>Não saber já é um diagnóstico. A perda passa a ser estimada pelos problemas identificados.</small>`:""}</div>
+      ${n.resTipo==="lucro"||n.resTipo==="prejuizo"?moneyField("numeros.resultado",n.resTipo==="lucro"?"Quanto sobra por mês (lucro)":"Quanto falta por mês (prejuízo)"):""}
+      <div class="field full"><label for="f-ref">Margem de referência do segmento</label>
+        <div style="display:flex;align-items:center;gap:8px"><input class="inp mono" id="f-ref" data-ref inputmode="decimal" style="width:90px;text-align:right" value="${n.margemRef!=null?numBR(n.margemRef):""}" placeholder="${numBR(MARGEM_REF[t])}"><span class="mono">%</span></div>
+        <small>Quanto sobra, em média, numa empresa de ${SEGMENTOS[t].t} bem gerida. Padrão: ${numBR(MARGEM_REF[t])}%. Ajuste se conhecer a referência do setor do cliente.</small></div>
+      ${S.respostas.F3&&(S.respostas.F3.n==="b"||S.respostas.F3.n==="i")?moneyField("numeros.juros","Quanto paga por mês em juros e tarifas?","Opcional. Se deixar em branco, usamos uma estimativa."):""}
+      <div class="field full"><span class="lbl">Há quanto tempo a empresa está nessa situação?</span>
+        <div class="seg">${TEMPOS.map(x=>`<button type="button" class="chip" data-tempo="${x.v}" aria-pressed="${n.tempo===x.v}">${x.t}</button>`).join("")}</div></div>
+    </div></div>
+    <div id="gapcard">${gapCardHTML()}</div>
+  </div>
+  <div id="leaks">${leaksHTML()}</div>${navRow()}`;
+}
+function refreshPerdas(full){
+  document.getElementById("gapcard").innerHTML=gapCardHTML();
+  if(full){document.getElementById("leaks").innerHTML=leaksHTML();return;}
+  const c=calc(S);
+  c.vaz.forEach(v=>{const el=document.getElementById("vzv-"+v.k); if(el)el.textContent=brl(c.modo==="saudavel"?v.teto:v.valor);});
+  const o=document.getElementById("vz-outros"); if(o)o.textContent=brl(c.outros);
+  const t=document.getElementById("vz-total"); if(t)t.textContent=brl(c.modo==="saudavel"?c.extra:c.perda);
+}
+function canaisHTML(){
+  return `<article class="q"><div class="qtop"><div class="qid">—</div><div class="qbody">
+    <div class="qtitle">Como a empresa vende hoje?</div>
+    <div class="dig"><b>Aprofunde</b><span>Qual desses canais traz mais clientes? E qual você já tentou e abandonou?</span></div>
+    <div class="chips" style="margin-top:14px">${CANAIS.map(c=>`<button type="button" class="chip" data-canal="${esc(c)}" aria-pressed="${S.empresa.canais.includes(c)}">${esc(c)}</button>`).join("")}</div>
+    <div class="hint" style="margin-top:8px">Marque todos os canais. Não entra na nota — serve de contexto para as perguntas comerciais.</div>
+  </div></div></article>`;
+}
+function weightDots(p){return `<span class="weight" title="Peso ${p} de 3">${[1,2,3].map(i=>`<i class="${i<=p?"on":""}"></i>`).join("")}</span>`;}
+function qHTML(q){
+  const r=S.respostas[q.id]||{}, sel=r.n;
+  return `<article class="q ${sel?"answered":""}" id="q-${q.id}">
+    <div class="qtop"><div class="qid">${q.id}</div><div class="qbody">
+      <div class="qtitle">${esc(q.q)}${weightDots(q.peso)}</div>
+      <div class="dig"><b>Aprofunde</b><span>${esc(q.dig)}</span></div>
+      <div class="levels" role="radiogroup" aria-label="Nível">
+        ${["b","i","a"].map(k=>`<div class="lv ${k}"><input type="radio" name="r-${q.id}" id="r-${q.id}-${k}" value="${k}" data-q="${q.id}" ${sel===k?"checked":""}>
+          <label for="r-${q.id}-${k}"><b>${NIVEL[k].t}</b>${esc(q[k])}</label></div>`).join("")}
+      </div>
+      <div class="qfoot">
+        <button type="button" class="linkbtn ${sel==="na"?"on":""}" data-na="${q.id}">${sel==="na"?"✓ Não se aplica":"Não se aplica"}</button>
+        ${sel?`<button type="button" class="linkbtn" data-clear="${q.id}">Limpar</button>`:""}
+      </div>
+    </div></div></article>`;
+}
+function renderDiag(){
+  const c=calc(S);
+  let html=`<div class="head"><div class="eyebrow">Etapa 2 de 5</div><h1>Diagnóstico em 6 pilares</h1>
+    <p>Faça a pergunta e use o "Aprofunde" para o cliente sentir o problema. Marque o nível que melhor descreve a empresa hoje. As bolinhas mostram o peso da pergunta.</p>
+    <p style="margin-top:8px">${S.empresa.tipo?`<span class="live">Perguntas adaptadas para ${SEGMENTOS[S.empresa.tipo].t}</span>`:`<b style="color:var(--warn)">Escolha o tipo de negócio na etapa 1 para adaptar as perguntas.</b>`}</p></div>
+    <div class="qtools"><div class="prog"><span>${c.respondidas}/${PERGUNTAS.length}</span><div class="track"><i style="width:${c.respondidas/PERGUNTAS.length*100}%"></i></div></div></div>`;
+  const QS=qsDe(S);
+  for(const p of PILARES){
+    const qs=QS.filter(q=>q.pilar===p);
+    const v=scoreOf(qs,S.respostas);
+    html+=`<div class="pillar-h" data-pilar="${p}"><h2>${esc(PL(S,p))}</h2><span>${v==null?"":pct(v)}</span></div>`
+      +(p==="Comercial"?canaisHTML():"")+qs.map(qHTML).join("");
+  }
+  return html+navRow();
+}
+function renderDor(){
+  const txt=v=>Array.isArray(v)?v.join("; "):(v||"");
+  return `<div class="head"><div class="eyebrow">Etapa 4 de 5</div><h1>Dor e urgência</h1>
+    <p>Feche a conversa com as palavras do próprio cliente. As respostas aparecem no documento como citações — escreva do jeito que ele falou.</p></div>
+  <div class="panel"><div class="grid2">
+    ${DOR.map(d=>`<div class="field full"><label for="f-dor-${d.k}">${d.q}</label><textarea class="inp" id="f-dor-${d.k}" data-bind="dor.${d.k}">${esc(txt(S.dor[d.k]))}</textarea></div>`).join("")}
+    <div class="field full"><span class="lbl">De 0 a 10, o quanto resolver isso é prioridade agora?</span>
+      <div class="scale">${Array.from({length:11},(_,i)=>`<button type="button" data-prio="${i}" aria-pressed="${S.dor.prioridade===i}">${i}</button>`).join("")}</div>
+      <div class="hint">Se for abaixo de 7, pergunte: "O que teria que acontecer para virar 10?"</div></div>
+    <div class="divider"></div>
+    <div class="field full"><span class="lbl">Próximo passo combinado</span>${chips("parecer.acao",PROX_ACOES)}</div>
+    <div class="field full"><span class="lbl">Quando</span>${chips("parecer.prazo",PROX_PRAZOS)}</div>
+    <div class="field full"><span class="lbl">Parecer (montado automaticamente)</span>
+      <div class="auto-parecer" id="auto-parecer">${esc(autoParecer(S))}</div>
+      <small>Gerado a partir do diagnóstico, dos números e das respostas acima. Aparece no documento enviado ao cliente.</small></div>
+  </div></div>${navRow()}`;
+}
+
+/* ---------- parecer automático (montado a partir das respostas) ---------- */
+const lowerFirst=t=>t?t.charAt(0).toLowerCase()+t.slice(1):t;
+const lista=a=>a.length<2?(a[0]||""):a.slice(0,-1).join(", ")+" e "+a[a.length-1];
+function autoParecer(s){
+  if(s.parecer.texto) return s.parecer.texto; /* diagnósticos antigos com parecer escrito */
+  const c=calc(s), e=s.empresa, nome=e.nome||"A empresa", P=[];
+  if(c.nota!=null) P.push(`${nome} está no nível ${c.mat.t.toLowerCase()} de maturidade de gestão, com nota ${dec(c.nota)} de 10.`+
+    (c.melhor&&c.pior&&c.melhor.p!==c.pior.p?` O pilar mais forte é ${c.melhor.p} (${pct(c.melhor.v)}) e o maior potencial de melhoria está em ${c.pior.p} (${pct(c.pior.v)}).`:""));
+  if(c.modo==="margem") P.push(`Hoje ${c.lucro<0?`a operação dá prejuízo de ${brl(-c.lucro)} por mês`:`sobram ${brl(c.lucro)} por mês (${pct1(c.margem)} do faturamento)`}, enquanto ${SEGMENTOS[tipoDe(s)].bem} deixaria ${brl(c.lucroRef)} (${numBR(c.refPct)}%). São ${brl(c.perda)} deixados na mesa todo mês — ${brl(c.perdaAno)} em 12 meses.`);
+  else if(c.modo==="estimativa"&&c.perda) P.push(`A empresa não mede quanto sobra no fim do mês. Pelos problemas identificados no diagnóstico, estimamos ${brl(c.perda)} de resultado perdido por mês — ${brl(c.perdaAno)} em 12 meses.`);
+  else if(c.modo==="saudavel") P.push(`A margem atual (${pct1(c.margem)}) já está dentro da referência do segmento; os pontos do diagnóstico indicam até ${brl(c.extra)} por mês de resultado adicional.`);
+  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  const top=[...c.vaz].filter(v=>val(v)>0).sort((a,b)=>val(b)-val(a)).slice(0,3);
+  if(top.length) P.push(`Os maiores vazamentos estão em: ${lista(top.map(v=>lowerFirst(v.t)))}.`);
+  const pr=c.crit.filter(x=>x.tipo==="Prioridade").slice(0,3);
+  if(pr.length) P.push(`As prioridades de ação são: ${lista(pr.map(x=>lowerFirst(x.q.ponto)))}.`);
+  const preoc=dorItens(s.dor.preocupa).join("; ").trim();
+  if(preoc) P.push(`${e.decisor?`Nas palavras de ${e.decisor}`:"Nas palavras do empresário"}, o que mais preocupa hoje: “${preoc.replace(/[.\s]+$/,"")}”${s.dor.prioridade!=null?` — prioridade ${s.dor.prioridade} de 10 para resolver agora`:""}.`);
+  P.push("O próximo passo é transformar esses pontos em um plano de ação com metas, responsáveis e prazos.");
+  return P.join("\n\n");
+}
+const proximoTxt=s=>s.parecer.acao?s.parecer.acao+(s.parecer.prazo?" — "+lowerFirst(s.parecer.prazo):""):(s.parecer.proximo||"");
+const dorItens=v=>Array.isArray(v)?v:(v?[v]:[]);
+
+/* ---------- gauges ---------- */
+function arc(cx,cy,r,a0,a1){const p=a=>[cx+r*Math.cos(a*Math.PI/180),cy-r*Math.sin(a*Math.PI/180)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
+const COL={b:"#C9402F",i:"#B97800",a:"#23894F"};
+/* Para o PDF: a biblioteca não desenha SVG de forma confiável, então os gráficos viram imagem (canvas → PNG). */
+let RASTER=false;
+function gaugePNG(v,label,big){
+  const k=3,cv=document.createElement("canvas"); cv.width=160*k; cv.height=96*k;
+  const x=cv.getContext("2d"); x.scale(k,k);
+  const cx=80,cy=84,r=64,sw=big?16:13;
+  x.lineCap="round"; x.lineWidth=sw;
+  x.strokeStyle="#E6E6E6"; x.beginPath(); x.arc(cx,cy,r,Math.PI,2*Math.PI); x.stroke();
+  if(v){x.strokeStyle=COL[lvlKey(v)]; x.beginPath(); x.arc(cx,cy,r,Math.PI,Math.PI+Math.PI*Math.max(.001,Math.min(1,v))); x.stroke();}
+  x.fillStyle="#05060C"; x.textAlign="center"; x.font=`500 ${big?27:21}px "IBM Plex Sans", system-ui, sans-serif`;
+  x.fillText(v==null?"—":big?dec(v*10):pct(v),cx,cy-6);
+  if(big){x.fillStyle="#6E6E6E"; x.font='9px Inter, system-ui, sans-serif'; x.fillText("de 10",cx,cy+10);}
+  return `<img src="${cv.toDataURL("image/png")}" alt="${esc(label)}" style="width:100%;max-width:150px;height:auto;display:block;margin:0 auto">`;
+}
+function logoPNG(){
+  const cv=document.createElement("canvas"); cv.width=460; cv.height=490;
+  const x=cv.getContext("2d"); x.lineWidth=54;
+  [[120,122,"#0D30A4"],[120,374,"#0D30A4"],[338,248,"#47C97E"]].forEach(([cx,cy,c])=>{x.strokeStyle=c; x.beginPath(); x.arc(cx,cy,86,0,2*Math.PI); x.stroke();});
+  return `<img src="${cv.toDataURL("image/png")}" alt="" style="width:34px;height:auto">`;
+}
+function gauge(v,label,big){
+  if(RASTER) return gaugePNG(v,label,big);
+  const w=160,h=96,cx=80,cy=84,r=64,sw=big?16:13;
+  const k=lvlKey(v);
+  const val=v==null?"—":big?dec(v*10):pct(v);
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}: ${val}">
+    <path d="${arc(cx,cy,r,180,0)}" fill="none" stroke="#E6E6E6" stroke-width="${sw}" stroke-linecap="round"/>
+    ${v?`<path d="${arc(cx,cy,r,180,180-180*Math.max(.001,Math.min(1,v)))}" fill="none" stroke="${COL[k]}" stroke-width="${sw}" stroke-linecap="round"/>`:""}
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="500" font-size="${big?27:21}" fill="#05060C">${val}</text>
+    ${big?`<text x="${cx}" y="${cy+10}" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#6E6E6E">de 10</text>`:""}
+  </svg>`;
+}
+
+/* ---------- documento ---------- */
+/* Tabela em divs: cada linha é um bloco que não é cortado entre páginas; o cabeçalho viaja junto com a 1ª linha (e com o título, se houver). */
+function dTable(cols,head,rows,lead=""){
+  const th=`<div class="d-tr d-th" style="grid-template-columns:${cols}">${head.map(h=>`<div>${h}</div>`).join("")}</div>`;
+  const tr=r=>`<div class="d-tr${r.cls?" "+r.cls:""}" style="grid-template-columns:${cols}">${r.cells.map(c=>`<div>${c}</div>`).join("")}</div>`;
+  if(!rows.length) return `<div class="avoid">${lead}${th}</div>`;
+  return `<div class="avoid">${lead}${th}${tr(rows[0])}</div>${rows.slice(1).map(r=>`<div class="avoid">${tr(r)}</div>`).join("")}`;
+}
+function resBars(c){
+  const max=Math.max(Math.abs(c.lucro),Math.abs(c.lucroPot),1);
+  const row=(lab,v,col)=>`<div class="rb"><span>${lab}</span><div class="rb-t"><i style="width:${Math.max(1.5,Math.abs(v)/max*100)}%;background:${col}"></i></div><b class="mono">${brl(v)}</b></div>`;
+  return `<div class="d-rbars avoid">${row(c.lucro<0?"Prejuízo hoje":"Sobra hoje",c.lucro,c.lucro<0?"#C9402F":"#7A7A7A")}${row("Referência do segmento",c.lucroPot,"#47C97E")}</div>`;
+}
+function reportHTML(s){
+  const c=calc(s), e=s.empresa, n=s.numeros;
+  const hoje=dataBR(s.atualizadoEm||new Date().toISOString());
+  const tempoTxt=n.tempo?TEMPOS.find(t=>t.v===n.tempo)?.t.toLowerCase():null;
+  const quotes=DOR.filter(d=>dorItens(s.dor[d.k]).some(x=>String(x).trim()));
+  const parecer=autoParecer(s), prox=proximoTxt(s);
+  const crit=c.crit;
+  return `<div class="doc">
+  <div class="d-cover">
+    <div><div class="logo">${RASTER?logoPNG():LOGO}<span>berry</span></div>
+      <div class="kicker">Diagnóstico empresarial</div>
+      <h1>${esc(e.nome||"Empresa")}</h1>
+      <div class="sub">${[e.tipo?SEGMENTOS[e.tipo].t:"",e.segmento].filter(Boolean).map(esc).join(" · ")}${e.funcionarios?` · ${e.funcionarios==="Só o dono"?"Só o dono":esc(e.funcionarios)+" funcionários"}`:""}</div></div>
+    <div class="d-meta">${hoje}<br>${e.decisor?`Para <b>${esc(e.decisor)}</b>${e.cargo?`, ${esc(e.cargo)}`:""}<br>`:""}${e.consultor?`Consultor: <b>${esc(e.consultor)}</b>`:""}</div>
+  </div>
+
+  <section class="avoid"><h2>Onde a empresa está hoje</h2>
+    <div class="d-kpis">
+      <div class="d-kpi hero"><div style="width:112px;flex:none">${gauge(c.nota==null?null:c.nota/10,"Nota geral",true)}</div>
+        <div><div class="k">Nota geral de gestão</div><div style="margin-top:6px">${c.mat?`<span class="pill ${c.mat.k}">Maturidade ${c.mat.t}</span>`:"—"}</div>
+        <div class="x" style="margin-top:6px">Média ponderada dos 6 pilares avaliados.</div></div></div>
+      <div class="d-kpi"><div class="k">${c.modo==="estimativa"?"Perda estimada por mês":"Deixando na mesa por mês"}</div><div class="v" style="color:var(--d-bad)">${brl(c.perda)}</div><div class="x">${c.perdaAno!=null?`${brl(c.perdaAno)} em 12 meses`:"Faturamento não informado"}</div></div>
+      <div class="d-kpi"><div class="k">Pontos críticos</div><div class="v">${c.prior}<span style="font-size:14px;color:var(--d-muted)"> prioridades</span></div><div class="x">+ ${c.oport} oportunidades de melhoria</div></div>
+    </div>
+  </section>
+
+  ${c.modo&&(c.perda||c.extra)?`<section><div class="avoid"><h2>Quanto a empresa está deixando na mesa</h2>
+    ${c.modo==="saudavel"?`<div class="d-next">A margem atual (${pct1(c.margem)}) já está dentro da referência de ${numBR(c.refPct)}% para ${SEGMENTOS[tipoDe(s)].t}. Os pontos do diagnóstico indicam até <b>${brl(c.extra)}/mês</b> de resultado adicional.</div>`
+    :`<div class="d-gap"><div><div class="lab">${c.modo==="margem"?"Diferença entre o lucro de hoje e o de uma empresa bem gerida do mesmo segmento":"Estimativa pelos problemas identificados (lucro atual não é medido)"}</div>
+      <div class="big">${brl(c.perda)}<span style="font-size:14px;font-weight:400"> / mês</span></div>
+      ${c.porReal!=null?`<div class="lab" style="margin-top:8px">Para cada R$ 1 que sobra hoje, <b style="color:#fff">R$ ${reais(c.porReal)}</b> ficam na mesa.</div>`:""}</div>
+      <div class="rows">
+        ${c.modo==="margem"?`<div class="row"><span>Referência: ${brl(n.fat)} × ${numBR(c.refPct)}%</span><b>${brl(c.lucroRef)}</b></div>
+        <div class="row"><span>${c.lucro<0?"Prejuízo":"Lucro"} atual (${pct1(c.margem)})</span><b>${brl(c.lucro)}</b></div>`:""}
+        <div class="row"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>
+        ${c.acum!=null?`<div class="row"><span>Já perdido (${tempoTxt})</span><b>${brl(c.acum)}</b></div>`:""}
+      </div></div>`}</div>
+    ${c.modo==="margem"?resBars(c):""}
+    <div class="d-tbl" style="margin-top:14px">${dTable("minmax(0,1fr) 170px 96px",
+      [c.modo==="margem"?"De onde vem a diferença":"Onde está vazando","Origem",`<span style="display:block;text-align:right">Por mês</span>`],
+      [...c.vaz.map(v=>({cells:[`<div class="pt">${esc(v.t)}</div>${esc(v.d)}`,
+          `<span class="pill ${v.n}">${NIVEL[v.n].t}</span><div class="pl" style="margin-top:4px">${esc(qsDe(s).find(q=>q.id===v.q).ponto)}</div>`,
+          `<div class="num">${brl(c.modo==="saudavel"?v.teto:v.valor)}</div>`]})),
+       ...(c.outros>0?[{cells:[`<div class="pt">Outros custos e estrutura</div>Parte da diferença não explicada pelos pontos do diagnóstico: custos fixos, estrutura e despesas a investigar.`,`<div class="pl">A investigar</div>`,`<div class="num">${brl(c.outros)}</div>`]}]:[]),
+       {cls:"d-total",cells:[`<b>Total</b>`,"",`<div class="num" style="color:var(--d-bad)">${brl(c.modo==="saudavel"?c.extra:c.perda)}</div>`]}])}</div>
+    <div style="font-size:11px;color:var(--d-muted);margin-top:6px">${c.modo==="margem"
+      ?`Como calculamos: faturamento (${brl(n.fat)}) × margem de referência do segmento (${numBR(c.refPct)}%) − lucro atual. A diferença é distribuída entre os pontos do diagnóstico na proporção do impacto estimado de cada um.`
+      :`Estimativa com base no faturamento informado (${brl(n.fat)}/mês) e no impacto típico de cada ponto do diagnóstico, validada na reunião.`}</div>
+  </section>`:""}
+
+  <section class="avoid"><h2>Desempenho por pilar</h2>
+    <div class="d-gauges">${c.pilares.map(p=>`<div class="d-g"><div class="nm">${p.p}</div>${gauge(p.v,p.p,false)}${p.v==null?`<div style="font-size:11px;color:var(--d-muted)">Não avaliado</div>`:""}</div>`).join("")}</div>
+    ${c.melhor?`<div class="d-best"><div class="g">Melhor área<b>${c.melhor.p} · ${pct(c.melhor.v)}</b></div><div class="r">Área com maior potencial de melhoria<b>${c.pior.p} · ${pct(c.pior.v)}</b></div></div>`:""}
+  </section>
+
+  ${crit.length?`<section>${dTable("118px minmax(0,1fr) minmax(0,1fr)",["Classificação","Problema","Caminho de solução"],
+    crit.map(x=>({cells:[`<span class="pill ${x.tipo==="Prioridade"?"b":x.tipo==="Oportunidade"?"i":"n"}">${x.tipo}</span><div class="pl" style="margin-top:6px">${esc(x.q.pilarNome)}</div>`,
+      `<div class="pt">${esc(x.q.ponto)}</div>${esc(x.n==="b"?x.q.pb:x.q.pi)}`,`<div class="sol">${esc(x.q.sol)}</div>`]})),
+    `<h2>Pontos críticos e caminhos de solução</h2><div class="d-counts"><span><b>${c.prior}</b> prioridades</span><span><b>${c.oport}</b> oportunidades</span><span><b>${crit.length-c.prior-c.oport}</b> pontos de atenção</span></div>`)}</section>`:""}
+
+  ${quotes.length?`<section>${(()=>{const qd=d=>{const v=s.dor[d.k]; return `<div class="d-quote"><div class="qq">${esc(d.q)}</div>${Array.isArray(v)?`<p class="lst">${v.map(x=>"• "+esc(x)).join("<br>")}</p>`:d.op.includes(v)?`<p class="lst">${esc(v)}</p>`:`<p>“${esc(String(v).trim())}”</p>`}</div>`;};
+      const pares=[]; for(let k=0;k<quotes.length;k+=2) pares.push(`<div class="d-quotes">${quotes.slice(k,k+2).map(qd).join("")}</div>`);
+      return `<div class="avoid"><h2>Nas suas palavras</h2>${pares[0]}</div>`+pares.slice(1).map(x=>`<div class="avoid" style="margin-top:10px">${x}</div>`).join("");})()}
+    ${s.dor.prioridade!=null?`<div style="margin-top:10px;font-size:12.5px">Prioridade declarada para resolver agora: <b class="mono">${s.dor.prioridade}/10</b></div>`:""}</section>`:""}
+
+  <section class="avoid"><h2>Parecer</h2>
+    <div class="d-parecer">${esc(parecer)}</div>
+    ${prox?`<div class="d-next"><b>Próximo passo:</b> ${esc(prox)}</div>`:""}</section>
+
+  <div class="d-foot"><span>Berry · Diagnóstico empresarial</span><span>${esc(e.nome||"")} · ${hoje}</span></div>
+</div>`;
+}
+function renderResultado(){
+  const c=calc(S);
+  const faltam=PERGUNTAS.length-c.respondidas;
+  return `<div class="head"><div class="eyebrow">Etapa 5 de 5</div><h1>Documento de diagnóstico</h1>
+    <p>É isso que o cliente recebe. Baixe em PDF para enviar${inArtifact()?"":" ou imprima"}.${faltam?` <b style="color:var(--warn)">Atenção: ${faltam} pergunta${faltam>1?"s":""} sem resposta.</b>`:""}</p></div>
+  <div class="actions">
+    <button class="btn primary" type="button" id="btn-pdf">Baixar PDF</button>
+    ${inArtifact()?"":`<button class="btn" type="button" id="btn-print">Imprimir</button>`}
+    <button class="btn" type="button" id="btn-perm" hidden>Reativar download</button>
+    <button class="btn" type="button" id="btn-png">Ver como imagem</button>
+    <button class="btn" type="button" id="btn-copy">Copiar resumo para WhatsApp</button>
+    <span class="toast" id="toast" role="status"></span>
+  </div>
+  <div id="plano-b" class="plano-b" hidden></div>
+  <div class="docwrap">${reportHTML(S)}</div>
+  ${navRow()}`;
+}
+
+/* ---------- ações do documento ---------- */
+function toast(t,fixo){const el=document.getElementById("toast"); if(!el)return; el.textContent=t; el.classList.toggle("warn",!!fixo); clearTimeout(el._t); if(t&&!fixo) el._t=setTimeout(()=>el.textContent="",6000);}
+function fileBase(){return ("Diagnostico Berry - "+(S.empresa.nome||"empresa")).replace(/[\\/:*?"<>|]/g,"").trim();}
+/* Gera o documento como canvas (uma imagem longa) — base tanto do PDF quanto da versão em imagem. */
+function montarPalco(){
+  const stage=document.getElementById("pdf-stage"); RASTER=true; try{stage.innerHTML=reportHTML(S);}finally{RASTER=false;}
+  return stage;
+}
+const PDF_OPT=()=>({margin:[8,0,10,0],filename:fileBase()+".pdf",image:{type:"jpeg",quality:.95},
+  html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true,letterRendering:true,scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},
+  pagebreak:{mode:["css","legacy"],avoid:[".avoid"]}});
+const comTempo=(p,ms,msg)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r({code:"timeout",message:msg}),ms))]);
+const ERRO_DL={declined:"Download cancelado.",rate_limited:"Já há um download aguardando confirmação — confirme ou feche a janela anterior.",
+  extension_not_enabled:"Esta visualização não permite baixar PDF.",rejected_extension:"Esta visualização não permite baixar PDF.",
+  unavailable:"Download indisponível nesta visualização.",not_granted:"Download não autorizado nesta visualização.",too_large:"Arquivo grande demais."};
+async function salvarArquivo(nome,blob){
+  if(!inArtifact()){const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=nome; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},4000); return "saved";}
+  const dl=await useCap("downloads");
+  if(!dl) throw {code:"unavailable"};
+  await dl.save({filename:nome,data:blob});
+  return "saved";
+}
+async function gerarPNG(){
+  const stage=montarPalco();
+  try{
+    const cv=await comTempo(html2pdf().set(PDF_OPT()).from(stage.firstElementChild).toCanvas().get("canvas"),45000,"tempo esgotado ao gerar a imagem");
+    return await new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no({code:"png"}),"image/png"));
+  }finally{stage.innerHTML="";}
+}
+/* Plano B que não depende do recurso de download do Claude: o documento aparece na tela como imagem,
+   e a pessoa salva com o botão direito ("Salvar imagem como…") ou copia. */
+async function mostrarImagem(motivo){
+  const box=document.getElementById("plano-b"); if(!box)return;
+  box.hidden=false; box.innerHTML=`<div class="pb-h"><b>Gerando o documento como imagem…</b></div>`;
+  const sx=window.scrollX, sy=window.scrollY; window.scrollTo(0,0);
+  try{
+    const blob=await gerarPNG(); window.scrollTo(sx,sy);
+    const url=URL.createObjectURL(blob);
+    box.innerHTML=`<div class="pb-h">${motivo?`<div class="pb-motivo">${motivo}</div>`:""}
+      <b>Para salvar:</b> clique com o botão direito na imagem e escolha <b>“Salvar imagem como…”</b> (no Mac: Control + clique), ou arraste a imagem para a área de trabalho. Também dá para copiar e colar direto no WhatsApp.
+      <div class="pb-btns"><button class="btn" type="button" id="btn-copy-img">Copiar imagem</button><button class="btn ghost" type="button" id="btn-fechar-pb">Fechar</button></div></div>
+      <img id="pb-img" src="${url}" alt="Documento de diagnóstico de ${esc(S.empresa.nome||"empresa")}">`;
+    box._blob=blob; box.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){window.scrollTo(sx,sy); box.innerHTML=`<div class="pb-h"><div class="pb-motivo">Não foi possível gerar a imagem: ${esc((e&&(e.message||e.code))||"erro desconhecido")}.</div></div>`;}
+}
+async function copiarImagem(){
+  const box=document.getElementById("plano-b");
+  try{await navigator.clipboard.write([new ClipboardItem({"image/png":box._blob})]); toast("Imagem copiada — cole no WhatsApp ou no e-mail.");}
+  catch(e){toast("Seu navegador não permitiu copiar. Use o botão direito na imagem → “Copiar imagem” ou “Salvar imagem como…”.",true);}
+}
+/* Antes de baixar, descobre se este visitante pode usar o download do Claude e por quê. */
+async function motivoBloqueio(){
+  if(!inArtifact()) return null;
+  const perm=await useCap("permissions",4000);
+  const st=perm?await perm.state("downloads").catch(()=>null):null;
+  if(st==="denied") return {code:"denied",perm};
+  const dl=await useCap("downloads");
+  if(!dl||st==="unavailable") return {code:"unavailable"};
+  return null;
+}
+const MOTIVO={
+  denied:"Você recusou um download deste link antes, e o Claude guardou essa escolha. Clique em <b>Reativar download</b> e ligue a opção “Downloads”, ou use a imagem abaixo.",
+  unavailable:"O download não está liberado para a sua conta neste link. Normalmente é porque você <b>não está logado no Claude</b> ou está com uma conta <b>fora da organização da Berry</b>. Faça login com a conta da Berry e recarregue — ou use a imagem abaixo.",
+  extension_not_enabled:"Esta visualização não permite baixar PDF. Use a imagem abaixo.",
+  rejected_extension:"Esta visualização não permite baixar PDF. Use a imagem abaixo.",
+  not_granted:"O download não foi autorizado nesta visualização. Use a imagem abaixo.",
+  capability_disabled:"O download não está disponível nesta visualização. Use a imagem abaixo.",
+  capability_removed:"O download não está disponível nesta visualização. Use a imagem abaixo."
+};
+async function baixarPDF(){
+  const btn=document.getElementById("btn-pdf"); btn.disabled=true; btn.textContent="Verificando…"; toast("");
+  const fim=()=>{btn.disabled=false; btn.textContent="Baixar PDF";};
+  const bloq=await motivoBloqueio();
+  if(bloq){
+    if(bloq.code==="denied") document.getElementById("btn-perm").hidden=false;
+    fim(); await mostrarImagem(MOTIVO[bloq.code]); return;
+  }
+  btn.textContent="Gerando PDF…";
+  const sx=window.scrollX, sy=window.scrollY; window.scrollTo(0,0); /* html2pdf sai em branco/cortado com a página rolada */
+  let blob=null;
+  try{
+    if(!window.html2pdf) throw {message:"a biblioteca de PDF não carregou (verifique a internet e recarregue a página)"};
+    try{await document.fonts.ready;}catch(e){}
+    const stage=montarPalco();
+    try{ blob=await comTempo(html2pdf().set(PDF_OPT()).from(stage.firstElementChild).outputPdf("blob"),45000,"tempo esgotado ao gerar o PDF"); }
+    finally{stage.innerHTML="";}
+  }catch(e){ window.scrollTo(sx,sy); fim(); toast("Não foi possível gerar o PDF: "+((e&&e.message)||"erro desconhecido")+".",true); return; }
+  window.scrollTo(sx,sy);
+  try{
+    await salvarArquivo(fileBase()+".pdf",blob);
+    toast(inArtifact()?"PDF salvo — confira a pasta de downloads.":"PDF baixado.");
+  }catch(e){
+    const c=e&&e.code;
+    if(c==="declined") toast("Download cancelado na janela de confirmação. Clique em Baixar PDF de novo e confirme.",true);
+    else if(c==="rate_limited") toast(ERRO_DL[c],true);
+    else { fim(); await mostrarImagem(MOTIVO[c]||("O download foi recusado ("+(c||"erro")+"). Use a imagem abaixo.")); return; }
+  }
+  fim();
+}
+async function reativarDownload(){
+  const perm=await useCap("permissions",4000);
+  try{ await perm.manage(); const st=await perm.state("downloads"); if(st!=="denied"){document.getElementById("btn-perm").hidden=true; toast("Download reativado. Clique em Baixar PDF.");} }
+  catch(e){ toast("Abra o menu do link (no topo da página) → Permissões e ligue “Downloads”.",true); }
+}
+function imprimir(){document.getElementById("print-area").innerHTML=reportHTML(S); window.print();}
+async function copiarResumo(){
+  const c=calc(S), e=S.empresa;
+  const linhas=[`*Diagnóstico Berry — ${e.nome||"Empresa"}*`,``,
+    `Nota geral: *${dec(c.nota)}/10* (maturidade ${c.mat?c.mat.t.toLowerCase():"—"})`,
+    c.perda?`${c.modo==="estimativa"?"Perda estimada":"Deixando na mesa"}: *${brl(c.perda)}/mês* (${brl(c.perdaAno)} em 12 meses)`:null,
+    c.modo==="margem"?`Hoje sobram ${brl(c.lucro)} (${pct1(c.margem)}); a referência do segmento é ${brl(c.lucroRef)} (${numBR(c.refPct)}%).`:null,
+    c.melhor?`Melhor área: ${c.melhor.p} (${pct(c.melhor.v)})`:null,
+    c.pior?`Maior potencial de melhoria: ${c.pior.p} (${pct(c.pior.v)})`:null,``,
+    c.crit.length?`*Prioridades:*`:null,
+    ...c.crit.filter(x=>x.tipo!=="Atenção").slice(0,5).map(x=>`• ${x.q.ponto}`),
+    proximoTxt(S)?``:null, proximoTxt(S)?`Próximo passo: ${proximoTxt(S)}`:null].filter(l=>l!==null);
+  const txt=linhas.join("\n");
+  try{await navigator.clipboard.writeText(txt); toast("Resumo copiado.");}
+  catch(e){const ta=document.createElement("textarea"); ta.value=txt; ta.className="inp"; ta.style.marginTop="10px"; document.querySelector(".actions").after(ta); ta.select(); toast("Selecione e copie o texto abaixo.");}
+}
+
+/* ---------- histórico ---------- */
+let drawerOpen=false, pendingDel=null;
+async function renderDrawer(){
+  const root=document.getElementById("drawer-root");
+  if(!drawerOpen){root.innerHTML="";return;}
+  const items=await listarTodos();
+  items.sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||""));
+  root.innerHTML=`<div class="scrim" data-close></div>
+  <aside class="drawer" role="dialog" aria-label="Histórico de diagnósticos">
+    <div class="drawer-h"><div><h2>Histórico</h2><div class="mt" style="font-size:12px;color:var(--muted)">${store.kind==="db"?"Compartilhado com o time":"Salvo neste navegador (faça login no Claude para ver o histórico do time)"}</div></div><button class="btn ghost" type="button" data-close>Fechar</button></div>
+    <div class="drawer-b">
+      <div class="hitem ${S.exemplo?"cur":""}"><div class="grow"><div class="nm">Panificadora Muriel</div><div class="mt">Exemplo</div></div><button class="btn" type="button" data-open-example>Ver</button></div>
+      ${items.length?items.map(it=>{const c=calc(it);return `<div class="hitem ${it.id===S.id?"cur":""}"><div class="grow">
+        <div class="nm">${esc(it.empresa?.nome||"Sem nome")}</div>
+        <div class="mt">${new Date(it.atualizadoEm).toLocaleDateString("pt-BR")}${it.empresa?.segmento?" · "+esc(it.empresa.segmento):""}${it._onde==="local"&&store.kind==="db"?" · só neste navegador":""}</div>
+        <div class="hbtns"><button class="btn" type="button" data-open="${it.id}">Abrir</button>
+          <button class="btn ${pendingDel===it.id?"danger":"ghost"}" type="button" data-del="${it.id}">${pendingDel===it.id?"Confirmar exclusão":"Excluir"}</button></div></div>
+        <div class="hscore" style="color:${c.mat?COL[c.mat.k]:"var(--muted)"}">${dec(c.nota)}<small>${c.mat?c.mat.t.toUpperCase():"—"}</small></div></div>`}).join("")
+      :`<div class="empty">Nenhum diagnóstico salvo ainda. Clique em “+ Novo diagnóstico” para começar — tudo é salvo automaticamente.</div>`}
+    </div></aside>`;
+}
+function hydrate(it){
+  const s=Object.assign(blank(),it);
+  s.numeros=Object.assign(blank().numeros,it.numeros||{});
+  if(s.numeros.fat==null&&it.numeros&&it.numeros.atual!=null) s.numeros.fat=it.numeros.atual;
+  s.vaz=it.vaz||{};
+  return s;
+}
+async function listarTodos(){
+  let db=[]; if(store.kind==="db"){try{db=(await store.list()).map(x=>({...x,_onde:"time"}));}catch(e){}}
+  let loc=[]; try{loc=(await localStore.list()).map(x=>({...x,_onde:"local"}));}catch(e){}
+  const m=new Map(); [...db,...loc].forEach(x=>{const o=m.get(x.id); if(!o||(x.atualizadoEm||"")>(o.atualizadoEm||""))m.set(x.id,x);});
+  return [...m.values()];
+}
+async function openDiag(id){
+  const items=await listarTodos(); const it=items.find(x=>x.id===id); if(!it)return; ondeSalvo=it._onde||null; delete it._onde;
+  S=hydrate(it); setCurrent(S.id); step=0; openNotes.clear(); tipoAviso=false; drawerOpen=false; renderDrawer(); render(); window.scrollTo(0,0);
+}
+function novo(){ondeSalvo=null; S=blank(); setCurrent(S.id); step=0; openNotes.clear(); tipoAviso=false; drawerOpen=false; renderDrawer(); render(); window.scrollTo(0,0); document.getElementById("f-empresa-nome")?.focus();}
+
+/* ---------- eventos ---------- */
+document.addEventListener("click",async ev=>{
+  const t=ev.target.closest("button,[data-close]"); if(!t)return;
+  if(t.dataset.go!=null){step=+t.dataset.go; render(); window.scrollTo(0,0); return;}
+  if(t.dataset.action==="new"||t.id==="btn-new"){novo();return;}
+  if(t.id==="btn-history"){drawerOpen=true; pendingDel=null; renderDrawer(); return;}
+  if(t.hasAttribute("data-close")){drawerOpen=false; renderDrawer(); return;}
+  if(t.hasAttribute("data-open-example")){S=exemplo(); step=0; drawerOpen=false; renderDrawer(); render(); return;}
+  if(t.dataset.open){openDiag(t.dataset.open); return;}
+  if(t.dataset.del){
+    if(pendingDel===t.dataset.del){await store.remove(t.dataset.del); if(S.id===t.dataset.del){S=exemplo(); step=0; render();} pendingDel=null;}
+    else{pendingDel=t.dataset.del; setTimeout(()=>{if(pendingDel===t.dataset.del){pendingDel=null; renderDrawer();}},4000);}
+    renderDrawer(); return;}
+  if(t.dataset.canal){const a=S.empresa.canais, i=a.indexOf(t.dataset.canal); i>=0?a.splice(i,1):a.push(t.dataset.canal); t.setAttribute("aria-pressed",i<0); touch(); return;}
+  if(t.dataset.tempo){S.numeros.tempo=+t.dataset.tempo; document.querySelectorAll("[data-tempo]").forEach(b=>b.setAttribute("aria-pressed",b===t)); refreshPerdas(); touch(); return;}
+  if(t.dataset.tipo){const antes=S.empresa.tipo; if(antes===t.dataset.tipo)return; S.empresa.tipo=t.dataset.tipo;
+    if(!SUBSEG[S.empresa.tipo].includes(S.empresa.segmento)) S.empresa.segmento="";
+    tipoAviso=!!(antes&&calc(S).respondidas>0); touch(); render(); return;}
+  if(t.dataset.pick){const path=t.dataset.pick, v=t.dataset.val, novoV=getPath(S,path)===v?(path.startsWith("empresa.")?"":null):v; setPath(S,path,novoV);
+    document.querySelectorAll(`[data-pick="${path}"]`).forEach(b=>b.setAttribute("aria-pressed",b.dataset.val===novoV)); afterPick(); touch(); return;}
+  if(t.hasAttribute("data-multi")){const path=t.dataset.multi; let a=getPath(S,path); if(!Array.isArray(a)){a=[]; setPath(S,path,a);}
+    const k=a.indexOf(t.dataset.val); k>=0?a.splice(k,1):a.push(t.dataset.val); t.setAttribute("aria-pressed",k<0); afterPick(); touch(); return;}
+  if(t.dataset.restipo){S.numeros.resTipo=t.dataset.restipo; touch(); render(); document.querySelector('[data-money="numeros.resultado"]')?.focus(); return;}
+  if(t.dataset.vazReset){delete S.vaz[t.dataset.vazReset]; refreshPerdas(true); touch(); return;}
+  if(t.dataset.prio!=null){S.dor.prioridade=+t.dataset.prio; document.querySelectorAll("[data-prio]").forEach(b=>b.setAttribute("aria-pressed",b===t)); afterPick(); touch(); return;}
+  if(t.dataset.na){const r=S.respostas[t.dataset.na]||(S.respostas[t.dataset.na]={nota:""}); r.n=r.n==="na"?null:"na"; refreshQ(t.dataset.na); return;}
+  if(t.dataset.clear){const r=S.respostas[t.dataset.clear]; if(r)r.n=null; refreshQ(t.dataset.clear); return;}
+  if(t.id==="btn-pdf"){baixarPDF();return;}
+  if(t.id==="btn-print"){imprimir();return;}
+  if(t.id==="btn-png"){mostrarImagem("");return;}
+  if(t.id==="btn-copy-img"){copiarImagem();return;}
+  if(t.id==="btn-fechar-pb"){const b=document.getElementById("plano-b"); b.hidden=true; b.innerHTML="";return;}
+  if(t.id==="btn-perm"){reativarDownload();return;}
+  if(t.id==="btn-copy"){copiarResumo();return;}
+});
+function afterPick(){const el=document.getElementById("auto-parecer"); if(el) el.textContent=autoParecer(S);}
+function refreshQ(id,save=true){
+  const q=qsDe(S).find(x=>x.id===id), el=document.getElementById("q-"+id);
+  if(el){el.outerHTML=qHTML(q);}
+  const c=calc(S);
+  document.querySelectorAll(".pillar-h").forEach(h=>{const p=h.dataset.pilar; const v=scoreOf(PERGUNTAS.filter(x=>x.pilar===p),S.respostas); h.querySelector("span").textContent=v==null?"":pct(v);});
+  const pr=document.querySelector(".prog"); if(pr){pr.querySelector("span").textContent=`${c.respondidas}/${PERGUNTAS.length}`; pr.querySelector("i").style.width=c.respondidas/PERGUNTAS.length*100+"%";}
+  if(save)touch(); else updateChrome();
+}
+document.addEventListener("change",ev=>{
+  const t=ev.target;
+  if(t.dataset.q){const r=S.respostas[t.dataset.q]||(S.respostas[t.dataset.q]={nota:""}); r.n=t.value; refreshQ(t.dataset.q);
+    document.getElementById("r-"+t.dataset.q+"-"+t.value)?.focus();}
+});
+document.addEventListener("input",ev=>{
+  const t=ev.target;
+  if(t.dataset.bind){setPath(S,t.dataset.bind,t.value); if(t.dataset.bind==="empresa.consultor"){try{localStorage.setItem("berry-consultor",t.value)}catch(e){}}
+    if(t.dataset.bind.startsWith("dor."))afterPick(); touch(); return;}
+  if(t.dataset.note){const r=S.respostas[t.dataset.note]||(S.respostas[t.dataset.note]={n:null}); r.nota=t.value; touch(); return;}
+  if(t.dataset.money){const v=parseMoney(t.value); setPath(S,t.dataset.money,v);
+    const pos=t.value.length-t.selectionStart; t.value=fmtMoneyInput(v); const np=Math.max(0,t.value.length-pos); t.setSelectionRange(np,np);
+    refreshPerdas(true); touch(); return;}
+  if(t.hasAttribute("data-ref")){S.numeros.margemRef=parseNum(t.value); refreshPerdas(true); touch(); return;}
+  if(t.dataset.vaz){const v=parseNum(t.value); if(v==null)delete S.vaz[t.dataset.vaz]; else S.vaz[t.dataset.vaz]=Math.min(100,v); refreshPerdas(); touch(); return;}
+});
+document.addEventListener("focusout",ev=>{
+  if(ev.target.dataset&&ev.target.dataset.vaz!=null)
+    setTimeout(()=>{const l=document.getElementById("leaks"); if(l&&!l.contains(document.activeElement)) refreshPerdas(true);},150);
+});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&drawerOpen){drawerOpen=false; renderDrawer();}});
+
+/* ---------- início ---------- */
+(async function start(){
+  render();
+  const db=await useCap("db");
+  if(db) store=dbStore(db);
+  let cur=null; try{cur=localStorage.getItem(LS_CUR)}catch(e){}
+  if(cur){try{const items=await listarTodos(); const it=items.find(x=>x.id===cur); if(it){ondeSalvo=it._onde; delete it._onde; S=hydrate(it); render();}}catch(e){}}
+  /* o que foi salvo no navegador antes do banco responder sobe para o histórico do time */
+  if(store.kind==="db"){try{for(const it of await localStore.list()){try{await store.save(it); await localStore.remove(it.id);}catch(e){break;}}}catch(e){}}
+})();
+</script>
+
+</body>
+</html>
