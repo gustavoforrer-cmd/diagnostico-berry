@@ -219,6 +219,34 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
 .hbtns .btn{padding:5px 10px;font-size:13px}
 .empty{color:var(--muted);font-size:14px;padding:20px 4px}
 
+/* ---------- transcrição ---------- */
+.ia-flag{font-size:12.5px;line-height:1.5;margin-top:8px;padding:7px 10px;border-radius:8px}
+.ia-flag q{font-style:italic;color:var(--ink)}
+.ia-flag.duvida{background:var(--warn-tint);color:var(--warn)}
+.ia-flag.duvida b{color:var(--warn)}
+.ia-flag.nm{border:1px dashed var(--line-strong);color:var(--muted)}
+.ia-flag.ok{color:var(--muted);padding:2px 0}
+.ia-flag.ok b{color:var(--green)}
+.iabar{background:var(--surface);border-bottom:1px solid var(--line)}
+.iabar-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.iabar-in b{color:var(--ink);font-weight:500}
+.ia-n{display:inline-flex;align-items:center;gap:6px}
+.ia-n i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.drawer.wide{width:min(680px,100%)}
+.ia-step{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)}
+.ia-step:last-child{border-bottom:0}
+.ia-step h3{font-size:15px;display:flex;gap:10px;align-items:center}
+.ia-step h3 span{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--black);display:grid;place-items:center;font-size:12px;flex:none}
+.ia-step p{margin:0;color:var(--muted);font-size:13.5px}
+.ia-step textarea.inp{min-height:150px;font-size:13px}
+.ia-msg{font-size:13.5px;padding:10px 12px;border-radius:8px;background:var(--surface-2)}
+.ia-msg.err{color:var(--bad)}
+.ia-pend{display:flex;flex-direction:column;gap:6px}
+.ia-pend button{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:13px;color:var(--ink)}
+.ia-pend button:hover{border-color:var(--line-strong)}
+.ia-pend small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+@media (max-width:860px){.iabar-in{padding-inline:16px}}
+
 /* ============ REPORT DOCUMENT (always light, it is paper) ============ */
 .doc{--d-blue:#0D30A4;--d-green:#47C97E;--d-ink:#05060C;--d-muted:#6E6E6E;--d-line:#E6E6E6;--d-soft:#F0F0F0;--d-gray:#7A7A7A;
   --d-bad:#C9402F;--d-warn:#B97800;--d-good:#23894F;
@@ -333,11 +361,14 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
     <div class="top-meta">
       <span class="live" id="live-score" title="Nota parcial">Nota —</span>
       <span class="status" id="save-status"><i></i><span>—</span></span>
+      <button class="btn" id="btn-ia" type="button">Preencher pela transcrição</button>
       <button class="btn ghost" id="btn-history" type="button">Histórico</button>
       <button class="btn" id="btn-new" type="button">+ Novo diagnóstico</button>
     </div>
   </div>
 </header>
+<div class="iabar" id="ia-bar" hidden></div>
+<div id="ia-root"></div>
 <div class="banner" id="example-banner" hidden>
   <div class="banner-in"><span><b>Diagnóstico de exemplo.</b> Os dados da Panificadora Muriel servem só para você ver como tudo funciona; nada aqui é salvo.</span><button class="btn primary" type="button" data-action="new">Começar um diagnóstico real</button></div>
 </div>
@@ -1008,6 +1039,7 @@ function updateChrome(){
   document.getElementById("live-score").textContent=c.nota==null?"Nota —":`Nota ${dec(c.nota)} · ${c.respondidas}/${PERGUNTAS.length}`;
   document.getElementById("top-company").textContent=S.empresa.nome?"· "+S.empresa.nome:"";
   document.getElementById("example-banner").hidden=!S.exemplo;
+  atualizarBarraIA();
   renderSteps(c);
 }
 function getPath(o,p){return p.split(".").reduce((a,k)=>a?.[k],o)}
@@ -1043,7 +1075,7 @@ function inp(path,label,opt={}){
   const id="f-"+path.replace(/\./g,"-");
   return `<div class="field ${opt.full?"full":""}"><label for="${id}">${label}</label>
     <input class="inp" id="${id}" data-bind="${path}" value="${esc(v)}" placeholder="${esc(opt.ph||"")}" ${opt.type?`type="${opt.type}"`:""} autocomplete="off">
-    ${opt.help?`<small>${opt.help}</small>`:""}</div>`;
+    ${opt.help?`<small>${opt.help}</small>`:""}${flagHTML(path)}</div>`;
 }
 function chips(path,opts,multi){
   const v=getPath(S,path);
@@ -1061,9 +1093,9 @@ function renderEmpresa(){
       <div class="tipos">${Object.entries(SEGMENTOS).map(([k,v])=>`<button type="button" class="tipo" data-tipo="${k}" aria-pressed="${t===k}"><b>${v.t}</b><span>${v.ex}</span></button>`).join("")}</div>
       <small>Adapta as perguntas, os textos e os vazamentos ao tipo de negócio.</small>
       ${tipoAviso?`<div class="hint" style="color:var(--warn)">Tipo de negócio alterado com o diagnóstico já iniciado. As respostas foram mantidas, mas algumas perguntas mudaram — revise o diagnóstico.</div>`:""}</div>
-    ${t?`<div class="field full"><span class="lbl">Segmento</span>${chips("empresa.segmento",SUBSEG[t])}</div>`:""}
-    <div class="field full"><span class="lbl">Cargo do decisor</span>${chips("empresa.cargo",CARGOS)}</div>
-    <div class="field full"><span class="lbl">Tamanho da equipe</span>${chips("empresa.funcionarios",PORTES)}</div>
+    ${t?`<div class="field full"><span class="lbl">Segmento</span>${chips("empresa.segmento",SUBSEG[t])}${flagHTML("empresa.segmento")}</div>`:""}
+    <div class="field full"><span class="lbl">Cargo do decisor</span>${chips("empresa.cargo",CARGOS)}${flagHTML("empresa.cargo")}</div>
+    <div class="field full"><span class="lbl">Tamanho da equipe</span>${chips("empresa.funcionarios",PORTES)}${flagHTML("empresa.funcionarios")}</div>
     ${inp("empresa.consultor","Consultor Berry",{ph:"Seu nome",help:"Fica salvo para os próximos diagnósticos."})}
   </div></div>${navRow()}`;
 }
@@ -1072,7 +1104,7 @@ function moneyField(path,label,help){
   return `<div class="field full"><label for="${id}">${label}</label>
     <div style="position:relative"><span class="mono" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)">R$</span>
     <input class="inp money" id="${id}" data-money="${path}" inputmode="numeric" value="${fmtMoneyInput(getPath(S,path))}" placeholder="0" style="padding-left:40px"></div>
-    ${help?`<small>${help}</small>`:""}</div>`;
+    ${help?`<small>${help}</small>`:""}${flagHTML(path)}</div>`;
 }
 const reais=v=>v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
 function gapCardHTML(){
@@ -1128,14 +1160,14 @@ function renderPerdas(){
       ${moneyField("numeros.fat","Faturamento médio mensal")}
       <div class="field full"><span class="lbl">No fim do mês, quanto sobra?</span>
         <div class="seg">${RESULTADO.map(r=>`<button type="button" class="chip" data-restipo="${r.v}" aria-pressed="${n.resTipo===r.v}">${r.t}</button>`).join("")}</div>
-        ${n.resTipo==="naosei"?`<small>Não saber já é um diagnóstico. A perda passa a ser estimada pelos problemas identificados.</small>`:""}</div>
+        ${n.resTipo==="naosei"?`<small>Não saber já é um diagnóstico. A perda passa a ser estimada pelos problemas identificados.</small>`:""}${flagHTML("numeros.resTipo")}</div>
       ${n.resTipo==="lucro"||n.resTipo==="prejuizo"?moneyField("numeros.resultado",n.resTipo==="lucro"?"Quanto sobra por mês (lucro)":"Quanto falta por mês (prejuízo)"):""}
       <div class="field full"><label for="f-ref">Margem de referência do segmento</label>
         <div style="display:flex;align-items:center;gap:8px"><input class="inp mono" id="f-ref" data-ref inputmode="decimal" style="width:90px;text-align:right" value="${n.margemRef!=null?numBR(n.margemRef):""}" placeholder="${numBR(MARGEM_REF[t])}"><span class="mono">%</span></div>
         <small>Quanto sobra, em média, numa empresa de ${SEGMENTOS[t].t} bem gerida. Padrão: ${numBR(MARGEM_REF[t])}%. Ajuste se conhecer a referência do setor do cliente.</small></div>
       ${S.respostas.F3&&(S.respostas.F3.n==="b"||S.respostas.F3.n==="i")?moneyField("numeros.juros","Quanto paga por mês em juros e tarifas?","Opcional. Se deixar em branco, usamos uma estimativa."):""}
       <div class="field full"><span class="lbl">Há quanto tempo a empresa está nessa situação?</span>
-        <div class="seg">${TEMPOS.map(x=>`<button type="button" class="chip" data-tempo="${x.v}" aria-pressed="${n.tempo===x.v}">${x.t}</button>`).join("")}</div></div>
+        <div class="seg">${TEMPOS.map(x=>`<button type="button" class="chip" data-tempo="${x.v}" aria-pressed="${n.tempo===x.v}">${x.t}</button>`).join("")}</div>${flagHTML("numeros.tempo")}</div>
     </div></div>
     <div id="gapcard">${gapCardHTML()}</div>
   </div>
@@ -1154,7 +1186,7 @@ function canaisHTML(){
     <div class="qtitle">Como a empresa vende hoje?</div>
     <div class="dig"><b>Aprofunde</b><span>Qual desses canais traz mais clientes? E qual você já tentou e abandonou?</span></div>
     <div class="chips" style="margin-top:14px">${CANAIS.map(c=>`<button type="button" class="chip" data-canal="${esc(c)}" aria-pressed="${S.empresa.canais.includes(c)}">${esc(c)}</button>`).join("")}</div>
-    <div class="hint" style="margin-top:8px">Marque todos os canais. Não entra na nota — serve de contexto para as perguntas comerciais.</div>
+    <div class="hint" style="margin-top:8px">Marque todos os canais. Não entra na nota — serve de contexto para as perguntas comerciais.</div>${flagHTML("empresa.canais")}
   </div></div></article>`;
 }
 function weightDots(p){return `<span class="weight" title="Peso ${p} de 3">${[1,2,3].map(i=>`<i class="${i<=p?"on":""}"></i>`).join("")}</span>`;}
@@ -1172,6 +1204,7 @@ function qHTML(q){
         <button type="button" class="linkbtn ${sel==="na"?"on":""}" data-na="${q.id}">${sel==="na"?"✓ Não se aplica":"Não se aplica"}</button>
         ${sel?`<button type="button" class="linkbtn" data-clear="${q.id}">Limpar</button>`:""}
       </div>
+      ${flagHTML("respostas."+q.id)}
     </div></div></article>`;
 }
 function renderDiag(){
@@ -1194,13 +1227,13 @@ function renderDor(){
   return `<div class="head"><div class="eyebrow">Etapa 4 de 5</div><h1>Dor e urgência</h1>
     <p>Feche a conversa com as palavras do próprio cliente. As respostas aparecem no documento como citações — escreva do jeito que ele falou.</p></div>
   <div class="panel"><div class="grid2">
-    ${DOR.map(d=>`<div class="field full"><label for="f-dor-${d.k}">${d.q}</label><textarea class="inp" id="f-dor-${d.k}" data-bind="dor.${d.k}">${esc(txt(S.dor[d.k]))}</textarea></div>`).join("")}
+    ${DOR.map(d=>`<div class="field full"><label for="f-dor-${d.k}">${d.q}</label><textarea class="inp" id="f-dor-${d.k}" data-bind="dor.${d.k}">${esc(txt(S.dor[d.k]))}</textarea>${flagHTML("dor."+d.k)}</div>`).join("")}
     <div class="field full"><span class="lbl">De 0 a 10, o quanto resolver isso é prioridade agora?</span>
       <div class="scale">${Array.from({length:11},(_,i)=>`<button type="button" data-prio="${i}" aria-pressed="${S.dor.prioridade===i}">${i}</button>`).join("")}</div>
-      <div class="hint">Se for abaixo de 7, pergunte: "O que teria que acontecer para virar 10?"</div></div>
+      <div class="hint">Se for abaixo de 7, pergunte: "O que teria que acontecer para virar 10?"</div>${flagHTML("dor.prioridade")}</div>
     <div class="divider"></div>
-    <div class="field full"><span class="lbl">Próximo passo combinado</span>${chips("parecer.acao",PROX_ACOES)}</div>
-    <div class="field full"><span class="lbl">Quando</span>${chips("parecer.prazo",PROX_PRAZOS)}</div>
+    <div class="field full"><span class="lbl">Próximo passo combinado</span>${chips("parecer.acao",PROX_ACOES)}${flagHTML("parecer.acao")}</div>
+    <div class="field full"><span class="lbl">Quando</span>${chips("parecer.prazo",PROX_PRAZOS)}${flagHTML("parecer.prazo")}</div>
     <div class="field full"><span class="lbl">Parecer (montado automaticamente)</span>
       <div class="auto-parecer" id="auto-parecer">${esc(autoParecer(S))}</div>
       <small>Gerado a partir do diagnóstico, dos números e das respostas acima. Aparece no documento enviado ao cliente.</small></div>
@@ -1491,6 +1524,211 @@ async function copiarResumo(){
   catch(e){const ta=document.createElement("textarea"); ta.value=txt; ta.className="inp"; ta.style.marginTop="10px"; document.querySelector(".actions").after(ta); ta.select(); toast("Selecione e copie o texto abaixo.");}
 }
 
+/* ---------- preencher pela transcrição ----------
+   O site não chama o Claude sozinho (precisaria de chave de API exposta). O fluxo é:
+   transcrição → pedido para o Claude (copiar/colar no claude.ai) → resposta em JSON → aplicar.
+   Só entra no diagnóstico o que o Claude marcar como "confirmado" com trecho da fala; dúvidas e
+   assuntos não falados ficam em branco e sinalizados. */
+const IA_CAMPOS = [
+  {k:"empresa.nome",path:"empresa.nome",rot:"Nome da empresa",tipo:"texto"},
+  {k:"empresa.decisor",path:"empresa.decisor",rot:"Nome do decisor",tipo:"texto"},
+  {k:"empresa.cargo",path:"empresa.cargo",rot:"Cargo do decisor",tipo:"opcao",ops:()=>CARGOS},
+  {k:"empresa.funcionarios",path:"empresa.funcionarios",rot:"Tamanho da equipe",tipo:"opcao",ops:()=>PORTES},
+  {k:"empresa.segmento",path:"empresa.segmento",rot:"Segmento",tipo:"opcao",ops:()=>SUBSEG[tipoDe(S)]},
+  {k:"empresa.canais",path:"empresa.canais",rot:"Canais de venda",tipo:"lista",ops:()=>CANAIS},
+  {k:"numeros.faturamento_mensal",path:"numeros.fat",rot:"Faturamento mensal",tipo:"reais"},
+  {k:"numeros.resultado_tipo",path:"numeros.resTipo",rot:"Quanto sobra (lucro/prejuízo)",tipo:"opcao",ops:()=>["lucro","prejuizo","naosei"]},
+  {k:"numeros.resultado_mensal",path:"numeros.resultado",rot:"Lucro/prejuízo mensal",tipo:"reais"},
+  {k:"numeros.juros_mensais",path:"numeros.juros",rot:"Juros e tarifas por mês",tipo:"reais"},
+  {k:"numeros.tempo_situacao",path:"numeros.tempo",rot:"Há quanto tempo nessa situação",tipo:"opcao",ops:()=>[6,12,24,36]},
+  {k:"dor.impediu",path:"dor.impediu",rot:"O que impediu",tipo:"texto"},
+  {k:"dor.tentou",path:"dor.tentou",rot:"O que já foi tentado",tipo:"texto"},
+  {k:"dor.preocupa",path:"dor.preocupa",rot:"O que mais preocupa",tipo:"texto"},
+  {k:"dor.seNada",path:"dor.seNada",rot:"Se nada mudar",tipo:"texto"},
+  {k:"dor.prioridade",path:"dor.prioridade",rot:"Prioridade (0 a 10)",tipo:"nota"},
+  {k:"parecer.acao",path:"parecer.acao",rot:"Próximo passo",tipo:"opcao",ops:()=>PROX_ACOES},
+  {k:"parecer.prazo",path:"parecer.prazo",rot:"Prazo do próximo passo",tipo:"opcao",ops:()=>PROX_PRAZOS}
+];
+let iaOpen=false, iaTranscricao="", iaResposta="", iaMsg=null, iaVerPend=false;
+const corta=(t,n=220)=>{t=String(t??"").trim(); return t.length>n?t.slice(0,n-1)+"…":t;};
+
+function promptIA(transcricao){
+  const t=tipoDe(S), qs=qsDe(S);
+  return `Você vai preencher o diagnóstico empresarial da Berry Consultoria a partir da transcrição de uma reunião com um empresário.
+
+REGRAS — siga à risca:
+1. Use SOMENTE o que o cliente disse de forma explícita na transcrição. Não deduza, não estime, não complete lacunas e não use conhecimento geral sobre o segmento.
+2. Falas do consultor não são evidência. Só valem as afirmações do cliente sobre a empresa dele (ou quando ele confirma explicitamente algo que o consultor disse).
+3. Para cada item, devolva um objeto com:
+   - "status": "confirmado" (o cliente disse claramente), "duvida" (falou do assunto, mas de forma vaga, aproximada, contraditória ou que não permite escolher uma opção) ou "nao_mencionado" (o assunto não apareceu na reunião).
+   - "valor": somente quando "confirmado"; nos outros casos, null.
+   - "evidencia": trecho literal da fala do cliente (até 200 caracteres) que sustenta a resposta; null quando não mencionado.
+   - "motivo": obrigatório quando "duvida" — uma frase dizendo o que faltou para decidir.
+4. Entre "confirmado" e "duvida", na dúvida escolha "duvida". É melhor o consultor confirmar do que a ferramenta errar.
+5. Responda APENAS com um bloco de código JSON, sem nenhum texto antes ou depois.
+
+TIPO DE NEGÓCIO: ${SEGMENTOS[t].t}
+
+CAMPOS (chave → o que preencher)
+- "empresa.nome": nome da empresa (texto).
+- "empresa.decisor": primeiro nome do empresário que participou da reunião (texto).
+- "empresa.cargo": uma destas opções exatas: ${CARGOS.join(" | ")}.
+- "empresa.funcionarios": tamanho da equipe, uma destas opções exatas: ${PORTES.join(" | ")}. Só se ele disser o número ou a faixa de pessoas.
+- "empresa.segmento": uma destas opções exatas: ${SUBSEG[t].join(" | ")}.
+- "empresa.canais": lista (array) com as opções exatas que o cliente citou como forma de vender hoje: ${CANAIS.join(" | ")}.
+- "numeros.faturamento_mensal": faturamento médio MENSAL em reais, como número (ex.: 25000). Valor anual, faixa ("uns 20 a 30 mil") ou estimativa vaga = "duvida".
+- "numeros.resultado_tipo": "lucro" (sobra dinheiro no mês), "prejuizo" (falta) ou "naosei" (ele disse que não sabe quanto sobra).
+- "numeros.resultado_mensal": quanto sobra (ou falta) por mês, em reais, como número positivo.
+- "numeros.juros_mensais": quanto paga por mês em juros e tarifas, em reais.
+- "numeros.tempo_situacao": há quanto tempo a empresa está nessa situação, em meses — um destes números: 6, 12, 24 ou 36 (36 = 3 anos ou mais). Use o mais próximo somente se ele disser um tempo.
+- "dor.impediu", "dor.tentou", "dor.preocupa", "dor.seNada": as palavras do próprio cliente, em citação (pode juntar trechos com " … "), sem reescrever nem resumir:
+   impediu = ${DOR[0].q}
+   tentou = ${DOR[1].q}
+   preocupa = ${DOR[2].q}
+   seNada = ${DOR[3].q}
+- "dor.prioridade": número de 0 a 10, somente se ele der essa nota.
+- "parecer.acao": próximo passo combinado, uma das opções exatas: ${PROX_ACOES.join(" | ")}.
+- "parecer.prazo": uma das opções exatas: ${PROX_PRAZOS.join(" | ")}.
+
+DIAGNÓSTICO — para cada pergunta, escolha o nível cuja descrição corresponde ao que o cliente disse: "b" (Básico), "i" (Intermediário), "a" (Avançado) ou "na" (o cliente disse que o assunto não se aplica ao negócio dele). Se ele falou do assunto mas não dá para escolher entre níveis, use "duvida" e informe também "candidatos" (ex.: ["b","i"]).
+${qs.map(q=>`${q.id} — ${q.q}\n   b: ${q.b}\n   i: ${q.i}\n   a: ${q.a}`).join("\n")}
+
+FORMATO DA RESPOSTA — inclua TODOS os campos acima e TODAS as perguntas (${qs.map(q=>q.id).join(", ")}):
+\`\`\`json
+{
+  "campos": {
+    "empresa.nome": {"status": "confirmado", "valor": "Nome", "evidencia": "trecho", "motivo": null},
+    "numeros.faturamento_mensal": {"status": "duvida", "valor": null, "evidencia": "trecho", "motivo": "falou em faixa, não em valor"}
+  },
+  "diagnostico": {
+    "F1": {"status": "duvida", "valor": null, "candidatos": ["b", "i"], "evidencia": "trecho", "motivo": "explicação"},
+    "F2": {"status": "nao_mencionado", "valor": null, "evidencia": null, "motivo": null}
+  }
+}
+\`\`\`
+
+TRANSCRIÇÃO DA REUNIÃO:
+"""
+${transcricao}
+"""`;
+}
+function lerRespostaIA(txt){
+  let t=String(txt||"").trim(); const m=t.match(/```(?:json)?\s*([\s\S]*?)```/); if(m)t=m[1];
+  const a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a<0||b<a) throw new Error("não encontrei o bloco de resposta");
+  const o=JSON.parse(t.slice(a,b+1));
+  if(!o||typeof o!=="object"||(!o.campos&&!o.diagnostico)) throw new Error("a resposta não está no formato esperado");
+  return o;
+}
+function validarIA(c,v){
+  if(v==null) return undefined;
+  if(c.tipo==="texto"){const x=String(v).trim(); return x?x:undefined;}
+  if(c.tipo==="reais"){const n=typeof v==="number"?v:parseMoney(v); return n!=null&&n>=0?Math.round(n):undefined;}
+  if(c.tipo==="nota"){const n=Number(v); return Number.isInteger(n)&&n>=0&&n<=10?n:undefined;}
+  if(c.tipo==="opcao"){const ops=c.ops(); const hit=ops.find(o=>String(o)===String(v)); return hit===undefined?undefined:hit;}
+  if(c.tipo==="lista"){const ops=c.ops(); const arr=(Array.isArray(v)?v:[v]).map(String).filter(x=>ops.includes(x)); return arr.length?arr:undefined;}
+}
+const fmtIA=v=>Array.isArray(v)?v.join(", "):typeof v==="number"&&v>100?brl(v):String(v);
+function aplicarIA(o){
+  if(S.exemplo){const t=S.empresa.tipo; novo(); S.empresa.tipo=t;}
+  const flags={}; let ok=0,duv=0,nm=0;
+  const marcar=(path,r,valor,setter)=>{
+    const st=r&&r.status, ev=r&&r.evidencia?corta(r.evidencia):null;
+    if(st==="confirmado"){
+      if(valor===undefined){flags[path]={status:"duvida",motivo:`A resposta trouxe um valor que não se encaixa nas opções (${corta(r.valor,80)}).`,evidencia:ev}; duv++; return;}
+      const atual=setter.get(); const vazio=atual==null||atual===""||(Array.isArray(atual)&&!atual.length);
+      if(vazio||JSON.stringify(atual)===JSON.stringify(valor)){setter.set(valor); flags[path]={status:"confirmado",evidencia:ev}; ok++;}
+      else {flags[path]={status:"duvida",motivo:`A transcrição indica “${corta(fmtIA(valor),80)}”, diferente do que já estava preenchido (mantido).`,evidencia:ev}; duv++;}
+    }else if(st==="duvida"){flags[path]={status:"duvida",motivo:r.motivo?corta(r.motivo,200):"O assunto ficou vago na reunião.",evidencia:ev,candidatos:(r.candidatos||[]).filter(k=>["b","i","a","na"].includes(k))}; duv++;}
+    else {flags[path]={status:"nao_mencionado"}; nm++;}
+  };
+  for(const c of IA_CAMPOS){
+    const r=o.campos&&o.campos[c.k];
+    marcar(c.path,r,r&&r.status==="confirmado"?validarIA(c,r.valor):undefined,{get:()=>getPath(S,c.path),set:v=>setPath(S,c.path,v)});
+  }
+  for(const q of qsDe(S)){
+    const r=o.diagnostico&&o.diagnostico[q.id], v=r&&["b","i","a","na"].includes(r.valor)?r.valor:undefined;
+    marcar("respostas."+q.id,r,v,{get:()=>S.respostas[q.id]&&S.respostas[q.id].n,set:x=>{S.respostas[q.id]=Object.assign(S.respostas[q.id]||{},{n:x});}});
+  }
+  S.ia={aplicadoEm:new Date().toISOString(),flags};
+  touch(); render();
+  return {ok,duv,nm};
+}
+function flagHTML(path){
+  const f=S.ia&&S.ia.flags&&S.ia.flags[path]; if(!f) return "";
+  const id="flag-"+path.replace(/\./g,"-");
+  if(f.status==="confirmado") return `<div class="ia-flag ok" id="${id}"><b>✓</b> Da reunião${f.evidencia?`: <q>${esc(f.evidencia)}</q>`:""}</div>`;
+  if(f.status==="duvida") return `<div class="ia-flag duvida" id="${id}"><b>Dúvida na transcrição:</b> ${esc(f.motivo||"")}${f.candidatos&&f.candidatos.length?` Possível: ${f.candidatos.map(k=>k==="na"?"Não se aplica":NIVEL[k].t).join(" ou ")}.`:""}${f.evidencia?` <q>${esc(f.evidencia)}</q>`:""}</div>`;
+  return `<div class="ia-flag nm" id="${id}">Não foi falado na reunião — pergunte ao cliente ou preencha manualmente.</div>`;
+}
+function limparFlag(path){
+  if(!(S.ia&&S.ia.flags&&S.ia.flags[path])) return;
+  delete S.ia.flags[path];
+  document.getElementById("flag-"+path.replace(/\./g,"-"))?.remove();
+  atualizarBarraIA();
+}
+function contarIA(){const c={ok:0,duv:0,nm:0}; for(const f of Object.values((S.ia&&S.ia.flags)||{})) f.status==="confirmado"?c.ok++:f.status==="duvida"?c.duv++:c.nm++; return c;}
+function atualizarBarraIA(){
+  const bar=document.getElementById("ia-bar"); if(!bar) return;
+  if(!S.ia||S.exemplo){bar.hidden=true; return;}
+  const c=contarIA(); bar.hidden=false;
+  bar.innerHTML=`<div class="iabar-in"><b>Preenchido pela transcrição</b>
+    <span class="ia-n"><i style="background:var(--green)"></i>${c.ok} da reunião</span>
+    <span class="ia-n"><i style="background:var(--warn)"></i>${c.duv} em dúvida</span>
+    <span class="ia-n"><i style="background:var(--line-strong)"></i>${c.nm} não falados</span>
+    ${c.duv+c.nm?`<button class="btn" type="button" data-ia-pend>Revisar pendências</button>`:`<span>Tudo revisado.</span>`}</div>`;
+}
+const passoDe=path=>path==="empresa.canais"||path.startsWith("respostas.")?1:path.startsWith("empresa.")?0:path.startsWith("numeros.")?2:3;
+function rotuloIA(path){
+  if(path.startsWith("respostas.")){const q=qsDe(S).find(x=>"respostas."+x.id===path); return q?`${q.id} · ${q.q}`:path;}
+  return (IA_CAMPOS.find(c=>c.path===path)||{}).rot||path;
+}
+function irPara(path){
+  iaOpen=false; renderIA(); step=passoDe(path); render();
+  setTimeout(()=>{const el=document.getElementById(path.startsWith("respostas.")?"q-"+path.slice(10):"flag-"+path.replace(/\./g,"-")); el&&el.scrollIntoView({behavior:"smooth",block:"center"});},60);
+}
+function renderIA(){
+  const root=document.getElementById("ia-root");
+  if(!iaOpen){root.innerHTML="";return;}
+  const pend=Object.entries((S.ia&&S.ia.flags)||{}).filter(([,f])=>f.status!=="confirmado").sort((a,b)=>passoDe(a[0])-passoDe(b[0]));
+  root.innerHTML=`<div class="scrim" data-ia-close></div>
+  <aside class="drawer wide" role="dialog" aria-label="Preencher pela transcrição">
+    <div class="drawer-h"><div><h2>Preencher pela transcrição</h2><div style="font-size:12px;color:var(--muted)">O Claude lê a reunião e preenche só o que o cliente disse.</div></div><button class="btn ghost" type="button" data-ia-close>Fechar</button></div>
+    <div class="drawer-b">
+      ${pend.length&&iaVerPend?`<div class="ia-step"><h3>Pendências para revisar (${pend.length})</h3><p>Clique para ir até o item.</p>
+        <div class="ia-pend">${pend.map(([p,f])=>`<button type="button" data-ia-ir="${p}"><span>${f.status==="duvida"?"⚠":"○"}</span><span>${esc(rotuloIA(p))}<small>${f.status==="duvida"?esc(f.motivo||"Em dúvida"):"Não falado na reunião"}</small></span></button>`).join("")}</div></div>`:""}
+      <div class="ia-step"><h3><span>1</span>Tipo de negócio e transcrição</h3>
+        <p>O tipo de negócio define as perguntas que o Claude vai avaliar.</p>
+        <div class="chips">${Object.entries(SEGMENTOS).map(([k,v])=>`<button type="button" class="chip" data-ia-tipo="${k}" aria-pressed="${S.empresa.tipo===k}">${v.t}</button>`).join("")}</div>
+        <label class="lbl" for="ia-transcricao" style="margin-top:6px">Transcrição da reunião</label>
+        <textarea class="inp" id="ia-transcricao" placeholder="Cole aqui a transcrição completa (Google Meet, Zoom, tl;dv, Fathom…)">${esc(iaTranscricao)}</textarea></div>
+      <div class="ia-step"><h3><span>2</span>Envie para o Claude</h3>
+        <p>Copie o pedido, abra o Claude, cole (Ctrl+V ou ⌘V) e envie. O pedido já leva a transcrição e as regras.</p>
+        <div class="pb-btns"><button class="btn primary" type="button" data-ia-copiar ${S.empresa.tipo?"":"disabled"}>Copiar pedido para o Claude</button>
+          <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Abrir o Claude ↗</a></div>
+        ${S.empresa.tipo?"":`<p style="color:var(--warn)">Escolha o tipo de negócio acima.</p>`}</div>
+      <div class="ia-step"><h3><span>3</span>Cole a resposta do Claude</h3>
+        <p>Copie a resposta inteira do Claude (o bloco de código) e cole aqui.</p>
+        <textarea class="inp" id="ia-resposta" placeholder='{"campos": … , "diagnostico": … }'>${esc(iaResposta)}</textarea>
+        <div class="pb-btns"><button class="btn primary" type="button" data-ia-aplicar>Aplicar ao diagnóstico</button></div>
+        ${iaMsg?`<div class="ia-msg ${iaMsg.err?"err":""}">${iaMsg.html}</div>`:""}</div>
+    </div></aside>`;
+}
+async function copiarPedidoIA(){
+  iaTranscricao=document.getElementById("ia-transcricao").value;
+  if(iaTranscricao.trim().length<200){iaMsg={err:true,html:"Cole a transcrição completa no passo 1 antes de copiar o pedido."}; renderIA(); return;}
+  const txt=promptIA(iaTranscricao);
+  try{await navigator.clipboard.writeText(txt); iaMsg={html:"Pedido copiado. Agora abra o Claude, cole e envie."};}
+  catch(e){const ta=document.getElementById("ia-resposta"); iaMsg={err:true,html:"O navegador não deixou copiar automaticamente. O pedido foi colocado no campo do passo 3: selecione tudo (Ctrl+A), copie (Ctrl+C), cole no Claude e depois apague esse campo."}; iaResposta=txt;}
+  renderIA();
+}
+function aplicarRespostaIA(){
+  iaResposta=document.getElementById("ia-resposta").value;
+  let o; try{o=lerRespostaIA(iaResposta);}catch(e){iaMsg={err:true,html:"Não consegui ler a resposta ("+esc(e.message)+"). Copie a resposta inteira do Claude — o bloco que começa com <b>{</b> e termina com <b>}</b>."}; renderIA(); return;}
+  const r=aplicarIA(o); iaResposta=""; iaTranscricao=""; iaVerPend=true;
+  iaMsg={html:`Pronto! <b>${r.ok}</b> itens preenchidos com base na reunião, <b>${r.duv}</b> em dúvida e <b>${r.nm}</b> não falados — esses ficaram em branco para você revisar.`};
+  renderIA();
+}
+
 /* ---------- histórico ---------- */
 let drawerOpen=false, pendingDel=null;
 async function renderDrawer(){
@@ -1536,6 +1774,14 @@ document.addEventListener("click",async ev=>{
   const t=ev.target.closest("button,[data-close]"); if(!t)return;
   if(t.dataset.go!=null){step=+t.dataset.go; render(); window.scrollTo(0,0); return;}
   if(t.dataset.action==="new"||t.id==="btn-new"){novo();return;}
+  if(t.id==="btn-ia"){iaOpen=true; iaMsg=null; iaVerPend=!!S.ia; renderIA(); return;}
+  if(t.hasAttribute("data-ia-close")){iaOpen=false; renderIA(); return;}
+  if(t.hasAttribute("data-ia-pend")){iaOpen=true; iaMsg=null; iaVerPend=true; renderIA(); return;}
+  if(t.dataset.iaIr){irPara(t.dataset.iaIr); return;}
+  if(t.dataset.iaTipo){iaTranscricao=document.getElementById("ia-transcricao").value; iaResposta=document.getElementById("ia-resposta").value;
+    if(S.exemplo){novo(); iaOpen=true;} S.empresa.tipo=t.dataset.iaTipo; touch(); render(); renderIA(); return;}
+  if(t.hasAttribute("data-ia-copiar")){copiarPedidoIA(); return;}
+  if(t.hasAttribute("data-ia-aplicar")){aplicarRespostaIA(); return;}
   if(t.id==="btn-history"){drawerOpen=true; pendingDel=null; renderDrawer(); return;}
   if(t.hasAttribute("data-close")){drawerOpen=false; renderDrawer(); return;}
   if(t.hasAttribute("data-open-example")){S=exemplo(); step=0; drawerOpen=false; renderDrawer(); render(); return;}
@@ -1544,20 +1790,20 @@ document.addEventListener("click",async ev=>{
     if(pendingDel===t.dataset.del){await store.remove(t.dataset.del); if(S.id===t.dataset.del){S=exemplo(); step=0; render();} pendingDel=null;}
     else{pendingDel=t.dataset.del; setTimeout(()=>{if(pendingDel===t.dataset.del){pendingDel=null; renderDrawer();}},4000);}
     renderDrawer(); return;}
-  if(t.dataset.canal){const a=S.empresa.canais, i=a.indexOf(t.dataset.canal); i>=0?a.splice(i,1):a.push(t.dataset.canal); t.setAttribute("aria-pressed",i<0); touch(); return;}
-  if(t.dataset.tempo){S.numeros.tempo=+t.dataset.tempo; document.querySelectorAll("[data-tempo]").forEach(b=>b.setAttribute("aria-pressed",b===t)); refreshPerdas(); touch(); return;}
+  if(t.dataset.canal){limparFlag("empresa.canais");const a=S.empresa.canais, i=a.indexOf(t.dataset.canal); i>=0?a.splice(i,1):a.push(t.dataset.canal); t.setAttribute("aria-pressed",i<0); touch(); return;}
+  if(t.dataset.tempo){limparFlag("numeros.tempo");S.numeros.tempo=+t.dataset.tempo; document.querySelectorAll("[data-tempo]").forEach(b=>b.setAttribute("aria-pressed",b===t)); refreshPerdas(); touch(); return;}
   if(t.dataset.tipo){const antes=S.empresa.tipo; if(antes===t.dataset.tipo)return; S.empresa.tipo=t.dataset.tipo;
     if(!SUBSEG[S.empresa.tipo].includes(S.empresa.segmento)) S.empresa.segmento="";
     tipoAviso=!!(antes&&calc(S).respondidas>0); touch(); render(); return;}
-  if(t.dataset.pick){const path=t.dataset.pick, v=t.dataset.val, novoV=getPath(S,path)===v?(path.startsWith("empresa.")?"":null):v; setPath(S,path,novoV);
+  if(t.dataset.pick){limparFlag(t.dataset.pick); const path=t.dataset.pick, v=t.dataset.val, novoV=getPath(S,path)===v?(path.startsWith("empresa.")?"":null):v; setPath(S,path,novoV);
     document.querySelectorAll(`[data-pick="${path}"]`).forEach(b=>b.setAttribute("aria-pressed",b.dataset.val===novoV)); afterPick(); touch(); return;}
-  if(t.hasAttribute("data-multi")){const path=t.dataset.multi; let a=getPath(S,path); if(!Array.isArray(a)){a=[]; setPath(S,path,a);}
+  if(t.hasAttribute("data-multi")){const path=t.dataset.multi; limparFlag(path); let a=getPath(S,path); if(!Array.isArray(a)){a=[]; setPath(S,path,a);}
     const k=a.indexOf(t.dataset.val); k>=0?a.splice(k,1):a.push(t.dataset.val); t.setAttribute("aria-pressed",k<0); afterPick(); touch(); return;}
-  if(t.dataset.restipo){S.numeros.resTipo=t.dataset.restipo; touch(); render(); document.querySelector('[data-money="numeros.resultado"]')?.focus(); return;}
+  if(t.dataset.restipo){limparFlag("numeros.resTipo");S.numeros.resTipo=t.dataset.restipo; touch(); render(); document.querySelector('[data-money="numeros.resultado"]')?.focus(); return;}
   if(t.dataset.vazReset){delete S.vaz[t.dataset.vazReset]; refreshPerdas(true); touch(); return;}
-  if(t.dataset.prio!=null){S.dor.prioridade=+t.dataset.prio; document.querySelectorAll("[data-prio]").forEach(b=>b.setAttribute("aria-pressed",b===t)); afterPick(); touch(); return;}
-  if(t.dataset.na){const r=S.respostas[t.dataset.na]||(S.respostas[t.dataset.na]={nota:""}); r.n=r.n==="na"?null:"na"; refreshQ(t.dataset.na); return;}
-  if(t.dataset.clear){const r=S.respostas[t.dataset.clear]; if(r)r.n=null; refreshQ(t.dataset.clear); return;}
+  if(t.dataset.prio!=null){limparFlag("dor.prioridade");S.dor.prioridade=+t.dataset.prio; document.querySelectorAll("[data-prio]").forEach(b=>b.setAttribute("aria-pressed",b===t)); afterPick(); touch(); return;}
+  if(t.dataset.na){limparFlag("respostas."+t.dataset.na);const r=S.respostas[t.dataset.na]||(S.respostas[t.dataset.na]={nota:""}); r.n=r.n==="na"?null:"na"; refreshQ(t.dataset.na); return;}
+  if(t.dataset.clear){limparFlag("respostas."+t.dataset.clear);const r=S.respostas[t.dataset.clear]; if(r)r.n=null; refreshQ(t.dataset.clear); return;}
   if(t.id==="btn-pdf"){baixarPDF();return;}
   if(t.id==="btn-print"){imprimir();return;}
   if(t.id==="btn-png"){mostrarImagem("");return;}
@@ -1577,15 +1823,15 @@ function refreshQ(id,save=true){
 }
 document.addEventListener("change",ev=>{
   const t=ev.target;
-  if(t.dataset.q){const r=S.respostas[t.dataset.q]||(S.respostas[t.dataset.q]={nota:""}); r.n=t.value; refreshQ(t.dataset.q);
+  if(t.dataset.q){limparFlag("respostas."+t.dataset.q);const r=S.respostas[t.dataset.q]||(S.respostas[t.dataset.q]={nota:""}); r.n=t.value; refreshQ(t.dataset.q);
     document.getElementById("r-"+t.dataset.q+"-"+t.value)?.focus();}
 });
 document.addEventListener("input",ev=>{
   const t=ev.target;
-  if(t.dataset.bind){setPath(S,t.dataset.bind,t.value); if(t.dataset.bind==="empresa.consultor"){try{localStorage.setItem("berry-consultor",t.value)}catch(e){}}
+  if(t.dataset.bind){limparFlag(t.dataset.bind); setPath(S,t.dataset.bind,t.value); if(t.dataset.bind==="empresa.consultor"){try{localStorage.setItem("berry-consultor",t.value)}catch(e){}}
     if(t.dataset.bind.startsWith("dor."))afterPick(); touch(); return;}
   if(t.dataset.note){const r=S.respostas[t.dataset.note]||(S.respostas[t.dataset.note]={n:null}); r.nota=t.value; touch(); return;}
-  if(t.dataset.money){const v=parseMoney(t.value); setPath(S,t.dataset.money,v);
+  if(t.dataset.money){limparFlag(t.dataset.money); const v=parseMoney(t.value); setPath(S,t.dataset.money,v);
     const pos=t.value.length-t.selectionStart; t.value=fmtMoneyInput(v); const np=Math.max(0,t.value.length-pos); t.setSelectionRange(np,np);
     refreshPerdas(true); touch(); return;}
   if(t.hasAttribute("data-ref")){S.numeros.margemRef=parseNum(t.value); refreshPerdas(true); touch(); return;}
@@ -1595,7 +1841,7 @@ document.addEventListener("focusout",ev=>{
   if(ev.target.dataset&&ev.target.dataset.vaz!=null)
     setTimeout(()=>{const l=document.getElementById("leaks"); if(l&&!l.contains(document.activeElement)) refreshPerdas(true);},150);
 });
-document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&drawerOpen){drawerOpen=false; renderDrawer();}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&drawerOpen){drawerOpen=false; renderDrawer();} if(ev.key==="Escape"&&iaOpen){iaOpen=false; renderIA();}});
 
 /* ---------- início ---------- */
 (async function start(){
