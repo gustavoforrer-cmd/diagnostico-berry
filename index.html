@@ -377,6 +377,35 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
 .rd-f b{color:var(--d-ink);font-weight:500}
 .d-prem ul{margin:0;padding-left:18px;color:var(--d-muted);font-size:11.5px;display:flex;flex-direction:column;gap:3px}
 .d-prem h2{font-size:13px}
+.lean section{margin-top:24px}
+.lean .d-cover{padding:22px 28px}
+.lean .d-cover .kicker{margin-top:18px}
+.d-k3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px}
+.k3{border:1px solid var(--d-line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;justify-content:center}
+.k3.hero{flex-direction:row;align-items:center;gap:12px;background:var(--d-soft);border-color:transparent}
+.k3 .k{font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);margin-bottom:4px}
+.k3 .v{font-family:var(--display);font-weight:500;font-size:24px;letter-spacing:-.02em;line-height:1.15}
+.k3 .v.red{color:var(--d-bad)}
+.k3 .x{font-size:11.5px;color:var(--d-muted)}
+.d-quote.one{margin-top:10px}
+.d-quote .prio{font-style:normal;font-family:var(--display);font-weight:500;font-size:11px;color:var(--d-ink);white-space:nowrap;margin-left:6px}
+.d-vz{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.vz-h{grid-column:1/-1;font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted)}
+.vz{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--d-line);padding:4px 0;font-size:12.5px}
+.vz b{font-family:var(--display);font-weight:500;color:var(--d-bad);white-space:nowrap}
+.d-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+.pb{display:grid;grid-template-columns:150px 1fr 38px;gap:10px;align-items:center;font-size:12.5px}
+.pb-t{height:10px;background:var(--d-soft);border-radius:6px;overflow:hidden}
+.pb-t i{display:block;height:100%;border-radius:6px}
+.pb b{text-align:right;font-family:var(--display);font-weight:500}
+.fr-rs{font-family:var(--display);font-weight:500;color:var(--d-bad);font-size:13px}
+.fr-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.fr-l li{display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.fr-l .dot{flex:none;width:7px;height:7px;border-radius:50%;transform:translateY(-1px)}
+.fr-l .dot.b{background:var(--d-bad)}.fr-l .dot.i{background:var(--d-warn)}
+.fr-m{font-size:11px;color:var(--d-muted)}
+.lean .d-next{margin-top:22px}
+.d-note{margin-top:18px;font-size:10.5px;color:var(--d-muted);line-height:1.5}
 .d-foot{margin-top:30px;padding-top:12px;border-top:1px solid var(--d-line);display:flex;justify-content:space-between;font-size:11px;color:var(--d-muted)}
 .avoid{break-inside:avoid;page-break-inside:avoid}
 #pdf-stage{position:fixed;left:-10000px;top:0;width:794px}
@@ -1003,7 +1032,7 @@ function blank(){
 }
 function exemplo(){
   const s=blank(); s.id="exemplo"; s.exemplo=true;
-  s.empresa={nome:"Panificadora Muriel",tipo:"industria",segmento:"Alimentos e bebidas",decisor:"Muriel",cargo:"Sócio / fundador",funcionarios:"6 a 20",canais:["Loja física","Indicação / boca a boca","WhatsApp"],consultor:"Consultor Berry"};
+  s.empresa={nome:"Panificadora Muriel",tipo:"industria",segmento:"Alimentos e bebidas",decisor:"Muriel",cargo:"Sócio / fundador",funcionarios:"6 a 20",canais:["Loja física","Indicação / boca a boca","WhatsApp"],consultor:""};
   s.numeros={fat:25000,resTipo:"lucro",resultado:1500,juros:600,margemRef:null,tempo:12};
   const r={F1:"i",F2:"b",F3:"b",P1:"b",P2:"i",E1:"i",E2:"b",C1:"b",C2:"b",C3:"i",C4:"b",M1:"i",M2:"b",O1:"b",O2:"a",O3:"b",O4:"i",O5:"b",O6:"b"};
   for(const k in r) s.respostas[k]={n:r[k]};
@@ -1346,7 +1375,7 @@ function renderDor(){
     <div class="field full"><span class="lbl">Quando</span>${chips("parecer.prazo",PROX_PRAZOS)}${flagHTML("parecer.prazo")}</div>
     <div class="field full"><span class="lbl">Parecer (montado automaticamente)</span>
       <div class="auto-parecer" id="auto-parecer">${esc(autoParecer(S))}</div>
-      <small>Gerado a partir do diagnóstico, dos números e das respostas acima. Aparece no documento enviado ao cliente.</small></div>
+      <small>Gerado a partir do diagnóstico, dos números e das respostas acima. Use como roteiro para a conversa de fechamento — o documento do cliente traz a versão resumida.</small></div>
   </div></div>${navRow()}`;
 }
 
@@ -1457,14 +1486,17 @@ function resBars(c){
   return `<div class="d-rbars avoid">${row(c.lucro<0?"Prejuízo hoje":"Sobra hoje",c.lucro,c.lucro<0?"#C9402F":"#7A7A7A")}${row("Referência do segmento",c.lucroPot,"#47C97E")}</div>`;
 }
 function reportHTML(s){
-  const c=calc(s), e=s.empresa, n=s.numeros;
+  /* Diagnóstico comercial: enxuto (cerca de 2 páginas). Clareza do problema, quantificação e urgência.
+     O detalhamento (como fazer, tabela completa de pontos) fica para o trabalho do consultor. */
+  const c=calc(s), e=s.empresa, n=s.numeros, P=plano(s,c);
   const hoje=dataBR(s.atualizadoEm||new Date().toISOString());
-  const tempoTxt=n.tempo?TEMPOS.find(t=>t.v===n.tempo)?.t.toLowerCase():null;
-  const quotes=DOR.filter(d=>dorItens(s.dor[d.k]).some(x=>String(x).trim()));
-  const parecer=autoParecer(s), prox=proximoTxt(s);
-  const crit=c.crit, P=plano(s,c), quem=e.decisor||"o empresário";
+  const prox=proximoTxt(s), quem=e.decisor||"o empresário";
   const temPerda=(c.modo==="margem"||c.modo==="estimativa")&&c.perda>0;
-  return `<div class="doc">
+  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  const vz=[...c.vaz].filter(v=>val(v)>0).sort((a,b)=>val(b)-val(a));
+  const topVz=vz.slice(0,4), restoVz=vz.slice(4).reduce((a,v)=>a+val(v),0)+(c.outros||0);
+  const fala=["preocupa","seNada","impediu"].map(k=>dorItens(s.dor[k]).join(" … ").trim()).find(Boolean);
+  return `<div class="doc lean">
   <div class="d-cover">
     <div><div class="logo">${RASTER?logoPNG():LOGO}<span>berry</span></div>
       <div class="kicker">Diagnóstico empresarial</div>
@@ -1473,105 +1505,50 @@ function reportHTML(s){
     <div class="d-meta">${hoje}<br>${e.decisor?`Para <b>${esc(e.decisor)}</b>${e.cargo?`, ${esc(e.cargo)}`:""}<br>`:""}${e.consultor?`Consultor: <b>${esc(e.consultor)}</b>`:""}</div>
   </div>
 
-  <section class="avoid d-exec"><h2>Resumo executivo</h2>
-    <p class="ex-lead">${esc(e.nome||"A empresa")} está no nível <b>${c.mat?c.mat.t.toLowerCase():"—"}</b> de maturidade de gestão (nota <b>${dec(c.nota)}</b> de 10)${temPerda?` e ${c.modo==="estimativa"?"perde, por estimativa,":"deixa"} <b class="ex-red">${brl(c.perda)} por mês</b> na mesa — <b>${brl(c.perdaAno)}</b> em 12 meses`:c.modo==="saudavel"?`, com margem dentro da referência e até <b>${brl(c.extra)}/mês</b> de resultado adicional possível`:""}.</p>
-    <div class="ex-grid">
-      <div><div class="ex-k">Os 3 achados principais</div>
-        ${P.achados.length?`<ol class="ex-list">${P.achados.map(i=>`<li><b>${esc(i.q.ponto)}</b>${i.reais>0?` <span class="ex-r">${brl(i.reais)}/mês</span>`:""}<br><span>${esc(primeiraFrase(i.n==="b"?i.q.pb:i.q.pi))}</span></li>`).join("")}</ol>`:`<p class="ex-p">Nenhum ponto crítico identificado.</p>`}</div>
-      <div><div class="ex-k">Por onde começar</div>
-        ${P.comecar.length?`<ol class="ex-list">${P.comecar.map(i=>`<li><b>${esc(i.q.ponto)}</b><br><span>${esc(i.q.pilarNome)} · ${QUAD[i.quad].t.toLowerCase()}</span></li>`).join("")}</ol>`:""}
-        ${temPerda?`<div class="ex-wait">Cada mês sem agir custa <b>${brl(c.perda)}</b>. Esperar 3 meses para começar significa <b>${brl(c.perda*3)}</b> a mais perdidos.</div>`:""}</div>
+  <section class="avoid"><h2>Resumo</h2>
+    <p class="ex-lead">${esc(e.nome||"A empresa")} está no nível <b>${c.mat?c.mat.t.toLowerCase():"—"}</b> de maturidade de gestão${temPerda?` e ${c.modo==="estimativa"?"perde, por estimativa,":"deixa"} <b class="ex-red">${brl(c.perda)} por mês</b> na mesa`:c.modo==="saudavel"?`, com margem dentro da referência e até <b>${brl(c.extra)}/mês</b> de resultado adicional possível`:""}.${P.achados.length?` Os pontos mais urgentes estão em ${lista(P.achados.map(i=>lowerFirst(i.q.ponto)))}.`:""}</p>
+    <div class="d-k3">
+      <div class="k3 hero"><div style="width:96px;flex:none">${gauge(c.nota==null?null:c.nota/10,"Nota geral",true)}</div>
+        <div><div class="k">Nota de gestão</div>${c.mat?`<span class="pill ${c.mat.k}">${c.mat.t}</span>`:""}</div></div>
+      <div class="k3"><div class="k">${c.modo==="estimativa"?"Perda estimada por mês":"Deixando na mesa por mês"}</div><div class="v red">${temPerda?brl(c.perda):"—"}</div><div class="x">${temPerda?`${brl(c.perdaAno)} em 12 meses`:""}</div></div>
+      <div class="k3"><div class="k">Se esperar 3 meses</div><div class="v red">${temPerda?brl(c.perda*3):"—"}</div><div class="x">${temPerda?"perdidos antes de começar":""}</div></div>
     </div>
+    ${fala?`<div class="d-quote one"><div class="qq">Nas palavras de ${esc(quem)}</div><p>“${esc(corta(fala,260))}”${s.dor.prioridade!=null?` <span class="prio">Prioridade ${s.dor.prioridade}/10</span>`:""}</p></div>`:""}
   </section>
 
-  <section class="avoid"><h2>Onde a empresa está hoje</h2>
-    <div class="d-kpis">
-      <div class="d-kpi hero"><div style="width:112px;flex:none">${gauge(c.nota==null?null:c.nota/10,"Nota geral",true)}</div>
-        <div><div class="k">Nota geral de gestão</div><div style="margin-top:6px">${c.mat?`<span class="pill ${c.mat.k}">Maturidade ${c.mat.t}</span>`:"—"}</div>
-        <div class="x" style="margin-top:6px">Média ponderada dos 6 pilares avaliados.</div></div></div>
-      <div class="d-kpi"><div class="k">${c.modo==="estimativa"?"Perda estimada por mês":"Deixando na mesa por mês"}</div><div class="v" style="color:var(--d-bad)">${brl(c.perda)}</div><div class="x">${c.perdaAno!=null?`${brl(c.perdaAno)} em 12 meses`:"Faturamento não informado"}</div></div>
-      <div class="d-kpi"><div class="k">Pontos críticos</div><div class="v">${c.prior}<span style="font-size:14px;color:var(--d-muted)"> prioridades</span></div><div class="x">+ ${c.oport} oportunidades de melhoria</div></div>
-    </div>
-  </section>
-
-  ${c.modo&&(c.perda||c.extra)?`<section><div class="avoid"><h2>Quanto a empresa está deixando na mesa</h2>
-    ${c.modo==="saudavel"?`<div class="d-next">A margem atual (${pct1(c.margem)}) já está dentro da referência de ${numBR(c.refPct)}% para ${SEGMENTOS[tipoDe(s)].t}. Os pontos do diagnóstico indicam até <b>${brl(c.extra)}/mês</b> de resultado adicional.</div>`
-    :`<div class="d-gap"><div><div class="lab">${c.modo==="margem"?"Diferença entre o lucro de hoje e o de uma empresa bem gerida do mesmo segmento":"Estimativa pelos problemas identificados (lucro atual não é medido)"}</div>
-      <div class="big">${brl(c.perda)}<span style="font-size:14px;font-weight:400"> / mês</span></div>
+  ${temPerda||c.modo==="saudavel"&&c.extra?`<section class="avoid"><h2>Quanto a empresa está deixando na mesa</h2>
+    <div class="d-gap"><div><div class="lab">${c.modo==="margem"?"Diferença entre o lucro de hoje e o de uma empresa bem gerida do mesmo segmento":c.modo==="estimativa"?"Estimativa pelos problemas identificados (o lucro atual não é medido)":"Resultado adicional possível"}</div>
+      <div class="big">${brl(c.modo==="saudavel"?c.extra:c.perda)}<span style="font-size:14px;font-weight:400"> / mês</span></div>
       ${c.porReal!=null?`<div class="lab" style="margin-top:8px">Para cada R$ 1 que sobra hoje, <b style="color:#fff">R$ ${reais(c.porReal)}</b> ficam na mesa.</div>`:""}</div>
       <div class="rows">
-        ${c.modo==="margem"?`<div class="row"><span>Referência: ${brl(n.fat)} × ${numBR(c.refPct)}%</span><b>${brl(c.lucroRef)}</b></div>
+        ${c.modo==="margem"?`<div class="row"><span>Lucro de referência (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div>
         <div class="row"><span>${c.lucro<0?"Prejuízo":"Lucro"} atual (${pct1(c.margem)})</span><b>${brl(c.lucro)}</b></div>`:""}
-        <div class="row"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>
-        ${c.acum!=null?`<div class="row"><span>Já perdido (${tempoTxt})</span><b>${brl(c.acum)}</b></div>`:""}
-      </div></div>`}</div>
-    ${c.modo==="margem"?resBars(c):""}
-    ${temPerda?`<div class="d-wait avoid"><div class="w-h">O custo de esperar</div>${[3,6,12].map(m=>`<div class="w-t"><span>Se nada mudar em ${m} meses</span><b>${brl(c.perda*m)}</b></div>`).join("")}</div>`:""}
-    <div class="d-tbl" style="margin-top:14px">${dTable("minmax(0,1fr) 170px 96px",
-      [c.modo==="margem"?"De onde vem a diferença":"Onde está vazando","Origem",`<span style="display:block;text-align:right">Por mês</span>`],
-      [...c.vaz.map(v=>({cells:[`<div class="pt">${esc(v.t)}</div>${esc(v.d)}`,
-          `<span class="pill ${v.n}">${NIVEL[v.n].t}</span><div class="pl" style="margin-top:4px">${esc(qsDe(s).find(q=>q.id===v.q).ponto)}</div>`,
-          `<div class="num">${brl(c.modo==="saudavel"?v.teto:v.valor)}</div>`]})),
-       ...(c.outros>0?[{cells:[`<div class="pt">Outros custos e estrutura</div>Parte da diferença não explicada pelos pontos do diagnóstico: custos fixos, estrutura e despesas a investigar.`,`<div class="pl">A investigar</div>`,`<div class="num">${brl(c.outros)}</div>`]}]:[]),
-       {cls:"d-total",cells:[`<b>Total</b>`,"",`<div class="num" style="color:var(--d-bad)">${brl(c.modo==="saudavel"?c.extra:c.perda)}</div>`]}])}</div>
-    <div style="font-size:11px;color:var(--d-muted);margin-top:6px">${c.modo==="margem"
-      ?`Como calculamos: faturamento (${brl(n.fat)}) × margem de referência do segmento (${numBR(c.refPct)}%) − lucro atual. A diferença é distribuída entre os pontos do diagnóstico na proporção do impacto estimado de cada um.`
-      :`Estimativa com base no faturamento informado (${brl(n.fat)}/mês) e no impacto típico de cada ponto do diagnóstico, validada na reunião.`}</div>
+        ${temPerda?`<div class="row"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>`:""}
+        ${temPerda&&c.acum!=null?`<div class="row"><span>Já perdido (${n.tempo?TEMPOS.find(t=>t.v===n.tempo).t.toLowerCase():""})</span><b>${brl(c.acum)}</b></div>`:""}
+      </div></div>
+    ${topVz.length?`<div class="d-vz"><div class="vz-h">Onde está vazando</div>${topVz.map(v=>`<div class="vz"><span>${esc(v.t)}</span><b>${brl(val(v))}</b></div>`).join("")}${restoVz>0?`<div class="vz"><span>Outros pontos</span><b>${brl(restoVz)}</b></div>`:""}</div>`:""}
   </section>`:""}
 
   <section class="avoid"><h2>Desempenho por pilar</h2>
-    <div class="d-gauges">${c.pilares.map(p=>`<div class="d-g"><div class="nm">${p.p}</div>${gauge(p.v,p.p,false)}${p.v==null?`<div style="font-size:11px;color:var(--d-muted)">Não avaliado</div>`:""}</div>`).join("")}</div>
-    ${c.melhor?`<div class="d-best"><div class="g">Melhor área<b>${c.melhor.p} · ${pct(c.melhor.v)}</b></div><div class="r">Área com maior potencial de melhoria<b>${c.pior.p} · ${pct(c.pior.v)}</b></div></div>`:""}
+    <div class="d-bars">${c.pilares.map(p=>`<div class="pb"><span>${esc(p.p)}</span><div class="pb-t">${p.v!=null?`<i style="width:${Math.max(2,p.v*100)}%;background:${COL[lvlKey(p.v)]}"></i>`:""}</div><b>${p.v==null?"—":pct(p.v)}</b></div>`).join("")}</div>
   </section>
 
-  ${P.itens.length?`<section><div class="avoid"><h2>Frentes de trabalho</h2>
-    <p class="d-intro">Os problemas encontrados se concentram em três frentes. Cada uma tem um objetivo e um valor em jogo.</p>
+  ${P.itens.length?`<section class="avoid"><h2>Onde atacar</h2>
     <div class="d-fr">${P.frentes.map(f=>`<div class="fr ${f.status==="Crítica"?"crit":f.status==="Atenção"?"aten":"ok"}">
-      <div class="fr-top"><span class="fr-st">${f.status}</span>${f.nota!=null?`<span class="fr-n">${pct(f.nota)}</span>`:""}</div>
-      <div class="fr-t">${f.t}</div><div class="fr-o">${f.obj}</div>
-      <div class="fr-r"><span>Em jogo</span><b>${f.reais>0?brl(f.reais)+"/mês":"—"}</b></div>
-      <div class="fr-c"><span>${f.its.length} ${f.its.length===1?"ponto":"pontos"} a resolver</span>${f.partida?`<span>Ponto de partida: <b>${esc(f.partida.q.ponto)}</b></span>`:""}</div>
-    </div>`).join("")}</div></div></section>
-
-  <section class="avoid"><h2>Matriz de prioridades</h2>
-    <p class="d-intro">Cada ponto crítico posicionado pelo impacto no resultado e pelo esforço para resolver.</p>
-    <div class="d-mx"><div class="mx-y">Impacto ↑</div>
-      <div class="mx-g">${["rapidos","estrut","ajustes","depois"].map(k=>`<div class="mx-q q-${k}"><div class="mx-h">${QUAD[k].t}</div><div class="mx-d">${QUAD[k].d}</div>
-        ${P.itens.filter(i=>i.quad===k).map(i=>`<div class="mx-i"><span>${esc(i.q.ponto)}</span>${i.reais>0?`<b>${brl(i.reais)}</b>`:""}</div>`).join("")||`<div class="mx-v">—</div>`}</div>`).join("")}</div>
-      <div class="mx-x">Esforço para resolver →</div></div>
-  </section>`:""}
-
-  ${crit.length?`<section>${dTable("118px minmax(0,1fr) minmax(0,1fr)",["Classificação","Problema","Caminho de solução"],
-    crit.map(x=>({cells:[`<span class="pill ${x.tipo==="Prioridade"?"b":x.tipo==="Oportunidade"?"i":"n"}">${x.tipo}</span><div class="pl" style="margin-top:6px">${esc(x.q.pilarNome)}</div>`,
-      `<div class="pt">${esc(x.q.ponto)}</div>${esc(x.n==="b"?x.q.pb:x.q.pi)}`,`<div class="sol">${esc(x.q.sol)}</div>`]})),
-    `<h2>Pontos críticos e caminhos de solução</h2><div class="d-counts"><span><b>${c.prior}</b> prioridades</span><span><b>${c.oport}</b> oportunidades</span><span><b>${crit.length-c.prior-c.oport}</b> pontos de atenção</span></div>`)}</section>`:""}
-
-  ${P.itens.length?`<section class="avoid"><h2>Roteiro dos próximos 90 dias</h2>
-    <p class="d-intro">A ordem recomendada para atacar os pontos críticos. Escopo, responsáveis e indicadores de cada etapa são detalhados no plano de trabalho.</p>
-    <div class="d-road">${P.ondas.map((o,k)=>`<div class="rd"><div class="rd-h"><span class="rd-k">${k+1}</span><div><div class="rd-t">${o.t}</div><div class="rd-n">${o.n}</div></div></div>
-      ${o.its.length?`<ul>${o.its.map(i=>`<li>${esc(i.q.ponto)}</li>`).join("")}</ul>`:`<p class="rd-v">Sem pontos críticos nesta etapa.</p>`}
-      <div class="rd-f"><b>Ao final:</b> ${o.fim}</div></div>`).join("")}</div>
-  </section>`:""}
-
-  ${quotes.length?`<section>${(()=>{const qd=d=>{const v=s.dor[d.k]; return `<div class="d-quote"><div class="qq">${esc(d.q)}</div>${Array.isArray(v)?`<p class="lst">${v.map(x=>"• "+esc(x)).join("<br>")}</p>`:d.op.includes(v)?`<p class="lst">${esc(v)}</p>`:`<p>“${esc(String(v).trim())}”</p>`}</div>`;};
-      const pares=[]; for(let k=0;k<quotes.length;k+=2) pares.push(`<div class="d-quotes">${quotes.slice(k,k+2).map(qd).join("")}</div>`);
-      return `<div class="avoid"><h2>Nas suas palavras</h2>${pares[0]}</div>`+pares.slice(1).map(x=>`<div class="avoid" style="margin-top:10px">${x}</div>`).join("");})()}
-    ${s.dor.prioridade!=null?`<div style="margin-top:10px;font-size:12.5px">Prioridade declarada para resolver agora: <b class="mono">${s.dor.prioridade}/10</b></div>`:""}</section>`:""}
-
-  <section class="avoid"><h2>Parecer</h2>
-    <div class="d-parecer">${esc(parecer)}</div>
-    ${prox?`<div class="d-next"><b>Próximo passo:</b> ${esc(prox)}</div>`:""}</section>
-
-  <section class="avoid d-prem"><h2>Como chegamos a esses números</h2>
-    <ul>
-      <li>Faturamento, resultado e demais informações foram declarados por ${esc(quem)} na reunião e não foram auditados.</li>
-      ${c.modo==="margem"?`<li>Lucro de referência: margem de ${numBR(c.refPct)}% sobre o faturamento — o que costuma sobrar em ${SEGMENTOS[tipoDe(s)].bem}.</li>`:""}
-      ${temPerda?`<li>O valor de cada problema é uma estimativa conservadora, limitada a um teto por problema; a soma nunca ultrapassa a diferença total${c.modo==="margem"?" entre o lucro atual e o de referência":""}.</li>`:""}
-      <li>Os níveis de maturidade foram atribuídos a partir das respostas dadas na reunião, em ${PERGUNTAS.length} perguntas distribuídas em 6 pilares.</li>
-      <li>A matriz e o roteiro indicam prioridade e ordem recomendadas; prazos e escopo são definidos no plano de trabalho.</li>
-    </ul>
+      <div class="fr-top"><span class="fr-st">${f.status}</span><b class="fr-rs">${f.reais>0?brl(f.reais)+"/mês":""}</b></div>
+      <div class="fr-t">${f.t}</div>
+      ${f.its.length?`<ul class="fr-l">${f.its.slice(0,3).map(i=>`<li><i class="dot ${i.n}"></i>${esc(i.q.ponto)}</li>`).join("")}</ul>${f.its.length>3?`<div class="fr-m">+ ${f.its.length-3} ${f.its.length-3===1?"ponto":"pontos"}</div>`:""}`:`<div class="fr-o">Sem pontos críticos.</div>`}
+    </div>`).join("")}</div>
   </section>
 
+  <section class="avoid"><h2>Roteiro dos próximos 90 dias</h2>
+    <div class="d-road">${P.ondas.map((o,k)=>`<div class="rd"><div class="rd-h"><span class="rd-k">${k+1}</span><div><div class="rd-t">${o.n}</div><div class="rd-n">${o.t}</div></div></div>
+      ${o.its.length?`<ul>${o.its.slice(0,3).map(i=>`<li>${esc(i.q.ponto)}</li>`).join("")}</ul>${o.its.length>3?`<div class="fr-m">+ ${o.its.length-3} ${o.its.length-3===1?"ponto":"pontos"}</div>`:""}`:`<p class="rd-v">—</p>`}</div>`).join("")}</div>
+  </section>`:""}
+
+  ${prox?`<div class="d-next avoid"><b>Próximo passo:</b> ${esc(prox)}</div>`:""}
+
+  <div class="d-note">Números declarados por ${esc(quem)} na reunião, sem auditoria.${c.modo==="margem"?` Lucro de referência: margem de ${numBR(c.refPct)}%, o que costuma sobrar em ${SEGMENTOS[tipoDe(s)].bem}.`:""}${temPerda?" Valores por problema são estimativas conservadoras.":""} Escopo, responsáveis e indicadores de cada etapa são definidos no plano de trabalho.</div>
   <div class="d-foot"><span>Berry · Diagnóstico empresarial</span><span>${esc(e.nome||"")} · ${hoje}</span></div>
 </div>`;
 }
