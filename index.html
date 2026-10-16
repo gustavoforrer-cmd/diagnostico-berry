@@ -140,6 +140,22 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
 .lk-p small{font-size:11px;color:var(--muted);white-space:nowrap}
 .lk-p .linkbtn{font-size:11px}
 .lk-v{text-align:right;font-weight:500;font-family:var(--display);white-space:nowrap}
+.pctin{display:flex;align-items:center;gap:8px}
+.pctin .inp{width:110px;text-align:right}
+.pctin span{color:var(--muted);font-size:13px}
+.st{font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px}
+.st-b{background:var(--bad-tint);color:var(--bad)}.st-i{background:var(--warn-tint);color:var(--warn)}.st-a{background:var(--good-tint);color:var(--good)}
+.faixa{display:flex;flex-direction:column;gap:6px}
+.fx-bar{position:relative;height:10px;border-radius:99px;background:var(--line);overflow:visible}
+.fx-bar i{position:absolute;top:0;bottom:0;display:block}
+.fx-r{left:0;background:var(--bad);opacity:.55;border-radius:99px 0 0 99px}.fx-a{background:var(--warn);opacity:.55}.fx-s{background:var(--good);opacity:.55;border-radius:0 99px 99px 0}
+.fx-m{position:absolute;top:-4px;width:4px;height:18px;margin-left:-2px;background:#fff;border-radius:2px;box-shadow:0 0 0 2px var(--black)}
+.fx-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);gap:8px}
+.pos{margin-top:14px;border-top:1px dashed var(--line-strong);padding-top:12px}
+.pos-h{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--display);margin-bottom:8px}
+.pos-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
+.pos-g div{display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
+.pos-g b{color:var(--ink);font-family:var(--display);font-weight:500;font-size:15px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:620px){.leak{grid-template-columns:minmax(0,1fr) 80px;}.lk-v{grid-column:1/-1;text-align:left}}
 
@@ -406,6 +422,15 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
 .fr-m{font-size:11px;color:var(--d-muted)}
 .lean .d-next{margin-top:22px}
 .d-note{margin-top:18px;font-size:10.5px;color:var(--d-muted);line-height:1.5}
+.d-faixa{margin-top:14px}
+.dfx-h{font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);margin-bottom:30px}
+.dfx-bar{position:relative;height:12px;border-radius:99px;background:var(--d-soft)}
+.dfx-bar i{position:absolute;top:0;bottom:0;display:block}
+.dfx-bar i:first-child{border-radius:99px 0 0 99px}.dfx-bar i:nth-child(3){border-radius:0 99px 99px 0}
+.dfx-m{position:absolute;top:-6px;width:3px;height:24px;margin-left:-1.5px;background:#05060C;border-radius:2px}
+.dfx-m span{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--display);font-weight:500;font-size:11px;color:#05060C}
+.dfx-m.pos{background:var(--d-good)}.dfx-m.pos span{color:var(--d-good);bottom:auto;top:26px}
+.dfx-l{display:flex;justify-content:space-between;font-size:10.5px;color:var(--d-muted);margin-top:46px}
 .d-foot{margin-top:30px;padding-top:12px;border-top:1px solid var(--d-line);display:flex;justify-content:space-between;font-size:11px;color:var(--d-muted)}
 .avoid{break-inside:avoid;page-break-inside:avoid}
 #pdf-stage{position:fixed;left:-10000px;top:0;width:794px}
@@ -669,22 +694,6 @@ const PERGUNTAS = [
    sol:"Criar uma política de remuneração variável simples, com regras claras e ligada às metas de cada área."}
 ];
 
-/* VAZAMENTOS: quanto de resultado a empresa perde por mês, em % do faturamento.
-   Só entram os ligados a perguntas marcadas como Básico (b) ou Intermediário (i).
-   Os % são estimativas conservadoras e podem ser ajustados na reunião. */
-const VAZAMENTOS = [
-  {k:"preco",q:"P1",t:"Preço mal formado",d:"Margem perdida em itens vendidos abaixo do custo real (impostos, taxas e despesas fora da conta).",b:4,i:2},
-  {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento com a base.",b:3,i:1.5},
-  {k:"perdas",q:"E2",t:"Perdas não medidas",d:"Validade, quebra, furto e erros que saem direto do lucro.",b:3,i:1.5},
-  {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2.5,i:1.25},
-  {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
-  {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
-  {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true},
-  {k:"mix",q:"P2",t:"Venda adicional não feita",d:"Ticket médio abaixo do potencial e mix menos rentável.",b:1.5,i:0.75},
-  {k:"estoque",q:"E1",t:"Estoque desorganizado",d:"Venda perdida por falta de produto e dinheiro parado em excesso.",b:1.5,i:0.75},
-  {k:"retrabalho",q:"O2",t:"Retrabalho e erros de entrega",d:"Custo de refazer, repor e perder cliente por erro interno.",b:1.5,i:0.75}
-];
-
 /* =====================================================================
    TIPOS DE NEGÓCIO
    Cada tipo pode: trocar textos de perguntas (por id), renomear pilares
@@ -926,64 +935,23 @@ const OVR = {
         sol:"Padronizar a entrega com checklist por serviço, prazos definidos e pesquisa de satisfação ao final."}
   }
 };
-const VAZ_SEG = {
-  comercio:[
-    {k:"preco",q:"P1",t:"Preço mal formado",d:"Margem perdida em itens vendidos abaixo do custo real (impostos, taxas e despesas fora da conta).",b:4,i:2},
-    {k:"perdas",q:"E2",t:"Quebra de estoque",d:"Furto, avaria, validade e erros de caixa que saem direto do lucro.",b:3,i:1.5},
-    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento com a base.",b:3,i:1.5},
-    {k:"estoque",q:"E1",t:"Ruptura e estoque parado",d:"Venda perdida por falta de produto e dinheiro parado no que não gira.",b:2,i:1},
-    {k:"atendimento",q:"O2",t:"Vendas perdidas no atendimento",d:"Clientes que entram e saem sem comprar por falta de padrão de atendimento.",b:2,i:1},
-    {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2,i:1},
-    {k:"mix",q:"P2",t:"Mix e giro mal geridos",d:"Capital em itens de baixa margem e baixo giro.",b:1.5,i:0.75},
-    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
-    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
-    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
-  ],
-  industria:[
-    {k:"preco",q:"P1",t:"Custo de produção desconhecido",d:"Produtos vendidos abaixo do custo real de fabricação.",b:4,i:2},
-    {k:"perdas",q:"E2",t:"Refugo e perda de rendimento",d:"Matéria-prima que entra e não vira produto vendável.",b:3,i:1.5},
-    {k:"pcp",q:"O1",t:"Produção sem planejamento",d:"Hora extra, paradas e urgências que encarecem a produção.",b:2.5,i:1.25},
-    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra e pedidos recorrentes que deixam de acontecer.",b:2.5,i:1.25},
-    {k:"materia",q:"E1",t:"Matéria-prima mal gerida",d:"Compra urgente mais cara, parada por falta e capital parado em estoque.",b:2,i:1},
-    {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Pedidos que se perdem por falta de follow-up.",b:2,i:1},
-    {k:"retrabalho",q:"O2",t:"Retrabalho e devoluções",d:"Custo de refazer, repor e perder cliente por falha de qualidade.",b:1.5,i:0.75},
-    {k:"mix",q:"P2",t:"Mix com produtos de baixa margem",d:"Capacidade da fábrica gasta com itens que pouco contribuem.",b:1.5,i:0.75},
-    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
-    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
-    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
-  ],
-  alimentacao:[
-    {k:"perdas",q:"E2",t:"Desperdício",d:"Sobras, validade, erros de preparo e consumo interno que saem direto do CMV.",b:5,i:2.5},
-    {k:"preco",q:"P1",t:"CMV fora de controle",d:"Itens sem ficha técnica vendidos abaixo do custo real (insumos, taxas de app, embalagem).",b:4,i:2},
-    {k:"canais",q:"C3",t:"Taxas de app e canais mal geridos",d:"Margem que fica com as plataformas por falta de canal próprio.",b:2.5,i:1.25},
-    {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento.",b:2.5,i:1.25},
-    {k:"estoque",q:"E1",t:"Compras sem controle",d:"Insumo que falta no serviço ou vence na câmara.",b:2,i:1},
-    {k:"mix",q:"P2",t:"Cardápio e venda adicional",d:"Pedidos sem bebida, sobremesa ou combo e itens de baixa margem em destaque.",b:1.5,i:0.75},
-    {k:"retrabalho",q:"O2",t:"Erros de preparo e atrasos",d:"Pratos refeitos, pedidos devolvidos e reembolsos.",b:1.5,i:0.75},
-    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
-    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
-    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
-  ],
-  servicos:[
-    {k:"ociosidade",q:"E1",t:"Horas ociosas",d:"Horas da equipe pagas e não faturadas.",b:5,i:2.5},
-    {k:"escopo",q:"E2",t:"Escopo não cobrado e inadimplência",d:"Trabalho entregue sem cobrança e valores que não foram recebidos.",b:4,i:2},
-    {k:"preco",q:"P1",t:"Preço abaixo do custo real da hora",d:"Contratos com margem baixa ou negativa sem ninguém perceber.",b:4,i:2},
-    {k:"clientes",q:"C4",t:"Clientes que cancelam ou não renovam",d:"Receita recorrente perdida por falta de rotina de retenção.",b:4,i:2},
-    {k:"followup",q:"C3",t:"Propostas sem retorno",d:"Negociações que esfriam por falta de follow-up.",b:3,i:1.5},
-    {k:"retrabalho",q:"O2",t:"Retrabalho na entrega",d:"Horas gastas refazendo trabalho que o cliente não paga.",b:2,i:1},
-    {k:"mix",q:"P2",t:"Serviços complementares não vendidos",d:"Ticket abaixo do potencial por falta de pacotes e recorrência.",b:1.5,i:0.75},
-    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
-    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
-    {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
-  ]
-};
 const tipoDe=s=>s.empresa.tipo||"comercio";
-/* Margem líquida de referência (% do faturamento) de uma empresa bem gerida em cada tipo de negócio. Editável na reunião. */
-const MARGEM_REF = {comercio:10,industria:15,alimentacao:12,servicos:20};
+/* Calculadora financeira (planilha "Diagnóstico Financeiro" da Berry).
+   Faixas de margem líquida por segmento (aba "Parâmetro"): até "risco" = zona de risco; até "atencao" = atenção;
+   acima = saudável; "saudavel" é a referência a buscar. */
+const PARAM = {alimentacao:{risco:8,atencao:15,saudavel:20},comercio:{risco:10,atencao:18,saudavel:22},
+  servicos:{risco:15,atencao:25,saudavel:35},industria:{risco:12,atencao:20,saudavel:28}};
+/* Custo principal: o nome muda conforme o tipo de negócio. */
+const CUSTO_NOME = {comercio:"CMV (custo da mercadoria)",alimentacao:"CMV (custo dos insumos)",industria:"Custo de produção (CPV)",servicos:"Custo direto do serviço"};
+/* Alavancas de ganho (melhoria em % do faturamento). q = pergunta do diagnóstico ligada à alavanca. */
+const ALAVANCAS = [
+  {k:"gCmv",q:"P1",t:t=>t==="servicos"?"Otimização do custo do serviço":t==="industria"?"Otimização do custo de produção":"Otimização do CMV",d:"Compras, preço e mix revisados para reduzir o custo principal.",sug:3},
+  {k:"gPerdas",q:"E2",t:()=>"Redução de perdas",d:"Desperdício, quebra, validade, furto e retrabalho sob controle.",sug:2},
+  {k:"gTaxas",q:"F1",t:()=>"Revisão de taxas",d:"Taxas de cartão, maquininha, antecipação e tarifas renegociadas.",sug:1.5}];
+const arred=v=>Math.ceil(v/1000)*1000;
 const PILAR_PADRAO={"Operacional":"Pessoas e Processos"};
 const PL=(s,p)=>(PILAR_NOME[tipoDe(s)]||{})[p]||PILAR_PADRAO[p]||p;
 function qsDe(s){const o=OVR[tipoDe(s)]||{}; return PERGUNTAS.map(q=>({...q,...(o[q.id]||{}),pilarNome:PL(s,q.pilar)}));}
-const vazDe=s=>VAZ_SEG[tipoDe(s)]||VAZAMENTOS;
 
 const CANAIS = ["Indicação / boca a boca","Loja física","Instagram / redes sociais","WhatsApp","Google / site","Marketplace / apps de entrega","Prospecção ativa","Representantes / revenda","Parcerias","Tráfego pago"];
 const TEMPOS = [{v:6,t:"Cerca de 6 meses"},{v:12,t:"Cerca de 1 ano"},{v:24,t:"Cerca de 2 anos"},{v:36,t:"3 anos ou mais"}];
@@ -1026,14 +994,14 @@ function blank(){
   return {id:"d"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
     criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString(),exemplo:false,
     empresa:{nome:"",tipo:null,segmento:"",decisor:"",cargo:"",funcionarios:"",canais:[],consultor:consultorSalvo()},
-    numeros:{fat:null,resTipo:null,resultado:null,juros:null,margemRef:null,tempo:null},
-    vaz:{},respostas:{},dor:{impediu:"",tentou:"",preocupa:"",seNada:"",prioridade:null},
+    numeros:{fat:null,cmv:null,imposto:null,perdas:null,taxas:null,folha:null,fixos:null,financeiros:null,pme:null,pmr:null,pmp:null,
+      gCmv:3,gPerdas:2,gTaxas:1.5,invest:null,tempo:null},respostas:{},dor:{impediu:"",tentou:"",preocupa:"",seNada:"",prioridade:null},
     parecer:{texto:"",proximo:"",acao:null,prazo:null}};
 }
 function exemplo(){
   const s=blank(); s.id="exemplo"; s.exemplo=true;
   s.empresa={nome:"Panificadora Muriel",tipo:"industria",segmento:"Alimentos e bebidas",decisor:"Muriel",cargo:"Sócio / fundador",funcionarios:"6 a 20",canais:["Loja física","Indicação / boca a boca","WhatsApp"],consultor:""};
-  s.numeros={fat:25000,resTipo:"lucro",resultado:1500,juros:600,margemRef:null,tempo:12};
+  s.numeros={fat:25000,cmv:38,imposto:6,perdas:4,taxas:3,folha:6000,fixos:2500,financeiros:600,pme:5,pmr:15,pmp:20,gCmv:3,gPerdas:2,gTaxas:1.5,invest:null,tempo:12};
   const r={F1:"i",F2:"b",F3:"b",P1:"b",P2:"i",E1:"i",E2:"b",C1:"b",C2:"b",C3:"i",C4:"b",M1:"i",M2:"b",O1:"b",O2:"a",O3:"b",O4:"i",O5:"b",O6:"b"};
   for(const k in r) s.respostas[k]={n:r[k]};
   s.dor={impediu:"Não consigo sair da produção para vender. Fico o dia inteiro no forno.",tentou:"Já paguei impulsionamento no Instagram, mas não vi retorno e parei.",
@@ -1061,46 +1029,34 @@ function calc(s){
     let tipo; if(q.peso===3&&r.n==="b")tipo="Prioridade"; else if(q.peso===3&&r.n==="i")tipo="Oportunidade"; else tipo="Atenção";
     crit.push({q,n:r.n,tipo,rank:(tipo==="Prioridade"?0:tipo==="Oportunidade"?1:2)*10+(r.n==="b"?0:1)});}
   crit.sort((a,b)=>a.rank-b.rank);
-  const n=s.numeros, fat=n.fat;
-  /* 1) Tetos: quanto cada problema identificado pode estar custando, em % do faturamento */
-  const vaz=[];
-  for(const v of vazDe(s)){
-    const r=s.respostas[v.q]; if(!r||(r.n!=="b"&&r.n!=="i"))continue;
-    let p, fixo=false;
-    if(v.money&&n.juros!=null&&fat){p=n.juros/fat*100; fixo=true;}
-    else p=(s.vaz&&s.vaz[v.k]!=null)?s.vaz[v.k]:v[r.n];
-    vaz.push({...v,n:r.n,p,fixo,padrao:v[r.n],teto:fat?fat*p/100:null,valor:null});
-  }
-  vaz.sort((a,b)=>b.p-a.p);
-  const tetoTotal=fat?vaz.reduce((a,x)=>a+x.teto,0):null;
-  /* 2) Lucro atual × lucro de referência do segmento */
-  const lucro=n.resTipo==="lucro"&&n.resultado!=null?n.resultado:n.resTipo==="prejuizo"&&n.resultado!=null?-n.resultado:null;
-  const refPct=n.margemRef!=null?n.margemRef:MARGEM_REF[tipoDe(s)];
-  const lucroRef=fat?fat*refPct/100:null;
-  let modo=null, perda=null, outros=0, extra=null;
-  if(fat&&lucro==null){ /* não sabe o lucro: estimativa pelos problemas do diagnóstico */
-    modo="estimativa"; perda=tetoTotal; vaz.forEach(v=>v.valor=v.teto);
-  }else if(fat){
-    const gap=lucroRef-lucro;
-    if(gap<=0){ modo="saudavel"; perda=0; extra=tetoTotal; vaz.forEach(v=>v.valor=0); }
-    else{
-      /* 3) Distribui a diferença: valores informados primeiro, estimados em proporção ao teto; o que passar dos tetos vai para "outros" */
-      modo="margem"; perda=gap; let rest=gap;
-      vaz.filter(v=>v.fixo).forEach(v=>{v.valor=Math.min(v.teto,rest); rest-=v.valor;});
-      const est=vaz.filter(v=>!v.fixo), E=est.reduce((a,v)=>a+v.teto,0);
-      if(rest>=E){ est.forEach(v=>v.valor=v.teto); outros=rest-E; }
-      else est.forEach(v=>v.valor=E?v.teto*rest/E:0);
-    }
-  }
-  const margem=(lucro!=null&&fat)?lucro/fat:null;
-  const lucroPot=(lucro!=null&&perda!=null)?lucro+perda:null;
+  const n=s.numeros, fat=n.fat||null, t=tipoDe(s), par=PARAM[t];
+  const pc=k=>(n[k]||0)/100;
+  /* estrutura (mesmas fórmulas da planilha; o imposto sobre a venda também é descontado do resultado) */
+  const varPct=pc("cmv")+pc("imposto")+pc("perdas")+pc("taxas");
+  const mc=1-varPct, cf=(n.folha||0)+(n.fixos||0)+(n.financeiros||0);
+  const temEstr=!!fat&&n.cmv!=null;
+  const ro=temEstr?fat*mc-cf:null, margem=temEstr?ro/fat:null;
+  const pe=temEstr&&mc>0?arred(cf/mc):null;
+  const temPrazo=n.pme!=null||n.pmr!=null||n.pmp!=null;
+  const ciclo=temPrazo?(n.pme||0)+(n.pmr||0)-(n.pmp||0):null;
+  const desemb=temEstr?fat-ro:null;
+  const necCap=temEstr&&ciclo!=null?(ciclo>0?arred(desemb/30*ciclo):0):null;
+  const status=margem==null?null:margem*100<=par.risco?{k:"b",t:"Zona de risco"}:margem*100<=par.atencao?{k:"i",t:"Atenção"}:{k:"a",t:"Saudável"};
+  /* alavancas de ganho */
+  const vaz=ALAVANCAS.map(a=>{const p=n[a.k]==null?0:n[a.k]; const r=s.respostas[a.q];
+    return {k:a.k,q:a.q,t:a.t(t),d:a.d,p,n:r&&(r.n==="b"||r.n==="i")?r.n:"i",valor:fat?fat*p/100:null};});
+  const ganho=fat?vaz.reduce((a,v)=>a+v.valor,0):null;
+  const roPos=ro!=null&&ganho!=null?ro+ganho:null, margemPos=roPos!=null?roPos/fat:null;
+  const necCapPos=temEstr&&ciclo!=null?(ciclo>0?arred(Math.max(0,desemb-ganho)/30*ciclo):0):null;
+  const lucroRef=fat?fat*par.saudavel/100:null;
   const respondidas=QS.filter(q=>s.respostas[q.id]&&s.respostas[q.id].n).length;
   return {nota,mat:maturidade(nota),pilares,melhor,pior,crit,
     prior:crit.filter(c=>c.tipo==="Prioridade").length,oport:crit.filter(c=>c.tipo==="Oportunidade").length,
-    vaz,modo,perda,outros,extra,tetoTotal,refPct,lucroRef,
-    perdaAno:perda!=null?perda*12:null,acum:(perda!=null&&n.tempo)?perda*n.tempo:null,
-    lucro,margem,lucroPot,margemPot:(lucroPot!=null&&fat)?lucroPot/fat:null,
-    porReal:(lucro>0&&perda)?perda/lucro:null,
+    par,temEstr,varPct,mc,cf,ro,margem,pe,ciclo,desemb,necCap,status,
+    vaz,perda:ganho,perdaAno:ganho!=null?ganho*12:null,acum:(ganho!=null&&n.tempo)?ganho*n.tempo:null,
+    roPos,margemPos,necCapPos,lucroRef,gapRef:margem!=null?Math.max(0,par.saudavel/100-margem)*fat:null,
+    invest:n.invest||null,roi:n.invest&&ganho?ganho/n.invest:null,payback:n.invest&&ganho?n.invest/ganho*30:null,
+    modo:fat?"alavancas":null,outros:0,
     potencial:nota?(10-nota)/nota:null,respondidas};
 }
 function maturidade(n){if(n==null)return null; if(n<5)return {k:"b",t:"Básico"}; if(n<8)return {k:"i",t:"Intermediário"}; return {k:"a",t:"Avançado"};}
@@ -1188,7 +1144,7 @@ function setPath(o,p,v){const ks=p.split("."); let t=o; ks.slice(0,-1).forEach(k
 function stepDone(i,c){
   if(i===0)return !!S.empresa.nome;
   if(i===1)return c.respondidas===PERGUNTAS.length;
-  if(i===2)return S.numeros.fat!=null&&!!S.numeros.resTipo;
+  if(i===2)return calc(S).temEstr;
   if(i===3)return S.dor.prioridade!=null;
   return false;
 }
@@ -1246,65 +1202,82 @@ function moneyField(path,label,help){
     ${help?`<small>${help}</small>`:""}${flagHTML(path)}</div>`;
 }
 const reais=v=>v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+function pctField(path,label,opt={}){
+  const id="f-"+path.replace(/\./g,"-"), v=getPath(S,path);
+  return `<div class="field ${opt.full?"full":""}"><label for="${id}">${label}</label>
+    <div class="pctin"><input class="inp mono" id="${id}" data-pct="${path}" inputmode="decimal" value="${v==null?"":numBR(v)}" placeholder="${opt.ph||"0"}"><span>${opt.un||"%"}</span></div>
+    ${opt.help?`<small>${opt.help}</small>`:""}${flagHTML(path)}</div>`;
+}
+function faixaHTML(c){
+  const par=c.par, max=Math.max(par.saudavel*1.6,(c.margem||0)*100+5,10), x=v=>Math.max(0,Math.min(100,v/max*100));
+  const m=c.margem==null?null:c.margem*100;
+  return `<div class="faixa"><div class="fx-bar"><i class="fx-r" style="width:${x(par.risco)}%"></i><i class="fx-a" style="left:${x(par.risco)}%;width:${x(par.atencao)-x(par.risco)}%"></i><i class="fx-s" style="left:${x(par.atencao)}%;right:0"></i>
+    ${m!=null?`<b class="fx-m" style="left:${x(Math.max(m,0))}%"></b>`:""}</div>
+    <div class="fx-l"><span>Risco até ${par.risco}%</span><span>Atenção até ${par.atencao}%</span><span>Saudável: ${par.saudavel}%+</span></div></div>`;
+}
 function gapCardHTML(){
-  const c=calc(S), n=S.numeros, seg=SEGMENTOS[tipoDe(S)].t;
-  if(!n.fat) return `<div class="gapcard"><div class="eyebrow">Resultado deixado na mesa</div>
-    <div class="muted">Preencha o faturamento mensal para calcular quanto a empresa está deixando na mesa.</div></div>`;
-  const tempoTxt=n.tempo?TEMPOS.find(t=>t.v===n.tempo)?.t.toLowerCase():null;
-  const tempoLinhas=`<div class="gapline"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>
-    ${c.acum!=null?`<div class="gapline"><span>Já perdido (${tempoTxt})</span><b>${brl(c.acum)}</b></div>`:""}`;
-  if(c.modo==="saudavel") return `<div class="gapcard"><div class="eyebrow">Margem dentro da referência</div>
-    <div class="gapbig">${pct1(c.margem)}</div>
-    <div class="muted">Sobram ${brl(c.lucro)} por mês — acima da referência de ${numBR(c.refPct)}% para ${seg}. ${c.extra?`Os problemas do diagnóstico ainda indicam até <b>${brl(c.extra)}/mês</b> de potencial adicional.`:""}</div></div>`;
-  if(c.modo==="estimativa") return `<div class="gapcard"><div class="eyebrow">Estimativa de perda mensal</div>
-    <div class="gapbig">${brl(c.perda)}</div>
-    <div class="muted">O cliente não sabe quanto sobra. Estimativa pelos problemas identificados no diagnóstico: ${pct1(c.perda/n.fat)} do faturamento.</div>
-    ${tempoLinhas}
-    <div class="gapline"><span>Quanto sobraria em ${SEGMENTOS[tipoDe(S)].bem} (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div></div>`;
-  return `<div class="gapcard"><div class="eyebrow">Deixando na mesa todo mês</div>
-    <div class="gapbig">${brl(c.perda)}</div>
-    ${c.porReal!=null?`<div class="muted">Para cada <b>R$ 1</b> que sobra hoje, <b>R$ ${reais(c.porReal)}</b> ficam na mesa.</div>`:""}
+  const c=calc(S), n=S.numeros;
+  if(!c.temEstr) return `<div class="gapcard"><div class="eyebrow">Raio-X financeiro</div>
+    <div class="muted">Preencha o faturamento e o ${CUSTO_NOME[tipoDe(S)].split(" (")[0]} para ver a margem, o ponto de equilíbrio e quanto a empresa está deixando na mesa.</div></div>`;
+  return `<div class="gapcard"><div class="eyebrow">Raio-X financeiro</div>
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div class="gapbig">${pct1(c.margem)}</div><span class="st st-${c.status.k}">${c.status.t}</span></div>
+    <div class="muted">Margem líquida hoje. Referência para ${SEGMENTOS[tipoDe(S)].t}: ${c.par.saudavel}%.</div>
+    ${(()=>{const vazios=[["imposto","impostos"],["perdas","perdas"],["taxas","taxas"],["folha","folha"],["fixos","outros custos fixos"]].filter(([k])=>n[k]==null).map(x=>x[1]);
+      return vazios.length?`<div class="muted" style="color:var(--warn)">Em branco, contando como zero: ${lista(vazios)}. Confirme com o cliente.</div>`:"";})()}
+    ${faixaHTML(c)}
     <div class="calc">
-      <div><span>Faturamento × margem de referência (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div>
-      <div><span>− ${c.lucro<0?"Prejuízo":"Lucro"} atual (${pct1(c.margem)})</span><b>${brl(c.lucro)}</b></div>
-      <div class="eq"><span>= Deixando na mesa</span><b>${brl(c.perda)}</b></div>
+      <div><span>Margem de contribuição</span><b>${pct1(c.mc)}</b></div>
+      <div><span>Custo fixo mensal</span><b>${brl(c.cf)}</b></div>
+      <div class="eq"><span>Resultado operacional</span><b>${brl(c.ro)}</b></div>
     </div>
-    ${tempoLinhas}</div>`;
+    <div class="gapline"><span>Ponto de equilíbrio</span><b>${c.pe!=null?brl(c.pe)+"/mês":"—"}</b></div>
+    <div class="gapline"><span>Ciclo financeiro</span><b>${c.ciclo!=null?c.ciclo+" dias":"—"}</b></div>
+    <div class="gapline"><span>Necessidade de capital de giro</span><b>${c.necCap!=null?brl(c.necCap):"—"}</b></div>
+  </div>`;
 }
 function leaksHTML(){
-  const c=calc(S);
-  if(!S.numeros.fat||(!c.vaz.length&&!c.outros)) return "";
-  const titulo=c.modo==="margem"?"De onde vem essa diferença":c.modo==="saudavel"?"Potencial adicional":"Onde o dinheiro está vazando";
-  const hint=c.modo==="margem"
-    ?`A diferença de ${brl(c.perda)} é distribuída entre os problemas do diagnóstico, na proporção do peso de cada um. O % é o <b>teto</b> que cada problema pode custar — valide com o cliente e ajuste.`
-    :c.modo==="saudavel"?"Problemas do diagnóstico que ainda podem melhorar o resultado. O % é o teto estimado de cada um."
-    :"Sem o lucro, cada problema entra pelo seu teto estimado em % do faturamento. Valide cada linha com o cliente e ajuste.";
-  return `<div class="panel" style="margin-top:20px"><div class="leaks-h"><h2 style="font-size:17px">${titulo}</h2><span class="hint">${hint}</span></div>
-    <div class="leaks"><div class="leak lk-head"><div>Problema</div><div>Teto</div><div>Por mês</div></div>
-    ${c.vaz.map(v=>`<div class="leak">
-      <div class="lk-t"><b>${esc(v.t)}</b><span>${esc(v.d)}</span><span class="lk-src"><i class="dot ${v.n}"></i>${v.q} · ${NIVEL[v.n].t}</span></div>
-      <div class="lk-p">${v.fixo?`<span class="mono" title="Calculado a partir dos juros informados">${numBR(Math.round(v.p*10)/10)}%</span><small>informado</small>`
-        :`<label class="sr" for="vz-${v.k}">Teto em % do faturamento</label><input class="inp mono" id="vz-${v.k}" data-vaz="${v.k}" inputmode="decimal" value="${numBR(v.p)}"><small>%${v.p!==v.padrao?` · <button type="button" class="linkbtn" data-vaz-reset="${v.k}">padrão ${numBR(v.padrao)}</button>`:""}</small>`}</div>
-      <div class="lk-v mono" id="vzv-${v.k}">${brl(c.modo==="saudavel"?v.teto:v.valor)}</div></div>`).join("")}
-    ${c.outros>0?`<div class="leak"><div class="lk-t"><b>Outros custos e estrutura</b><span>Parte da diferença que os problemas do diagnóstico não explicam: custos fixos, estrutura e despesas a investigar.</span></div><div class="lk-p"></div><div class="lk-v mono" id="vz-outros">${brl(c.outros)}</div></div>`:""}
-    <div class="leak total"><div class="lk-t"><b>Total por mês</b></div><div class="lk-p"></div><div class="lk-v mono" id="vz-total">${brl(c.modo==="saudavel"?c.extra:c.perda)}</div></div>
-    </div></div>`;
+  const c=calc(S), n=S.numeros, t=tipoDe(S);
+  return `<div class="panel" style="margin-top:20px"><div class="leaks-h"><h2 style="font-size:17px">Quanto dá para recuperar</h2>
+    <span class="hint">Melhoria estimada em cada alavanca, em % do faturamento. Ajuste com o cliente — esse é o valor que aparece como “deixando na mesa”.</span></div>
+    <div class="leaks"><div class="leak lk-head"><div>Alavanca</div><div>Melhoria</div><div>Por mês</div></div>
+    ${ALAVANCAS.map(a=>{const v=c.vaz.find(x=>x.k===a.k); const atual=a.k==="gPerdas"?n.perdas:a.k==="gTaxas"?n.taxas:n.cmv;
+      return `<div class="leak"><div class="lk-t"><b>${esc(a.t(t))}</b><span>${esc(a.d)}</span>${atual!=null&&v.p>atual?`<span class="lk-src" style="color:var(--warn)">Maior que o percentual atual (${numBR(atual)}%)</span>`:""}</div>
+      <div class="lk-p"><label class="sr" for="f-numeros-${a.k}">Melhoria em %</label><input class="inp mono" id="f-numeros-${a.k}" data-pct="numeros.${a.k}" inputmode="decimal" value="${numBR(v.p)}"><small>%</small></div>
+      <div class="lk-v mono" id="vzv-${a.k}">${brl(v.valor)}</div></div>`;}).join("")}
+    <div class="leak total"><div class="lk-t"><b>Ganho mensal</b><span id="vz-ano">${c.perdaAno!=null?brl(c.perdaAno)+" por ano":""}</span></div><div class="lk-p"></div><div class="lk-v mono" id="vz-total">${brl(c.perda)}</div></div>
+    </div>
+    <div class="pos" id="pos">${posHTML(c)}</div>
+    <div class="grid2" style="margin-top:14px">${moneyField("numeros.invest","Investimento no projeto (opcional)","Se preenchido, o documento mostra o retorno (ROI) e em quantos dias o projeto se paga.")}</div>
+  </div>`;
+}
+function posHTML(c){
+  if(!c.temEstr) return "";
+  return `<div class="pos-h">Com os ajustes</div>
+    <div class="pos-g"><div><span>Resultado</span><b>${brl(c.ro)} → ${brl(c.roPos)}</b></div>
+    <div><span>Margem líquida</span><b>${pct1(c.margem)} → ${pct1(c.margemPos)}</b></div>
+    ${c.necCap!=null?`<div><span>Capital de giro</span><b>${brl(c.necCap)} → ${brl(c.necCapPos)}</b></div>`:""}
+    ${c.roi!=null?`<div><span>Retorno do investimento</span><b>${dec(c.roi)}× ao mês · paga em ${Math.max(1,Math.round(c.payback))} dias</b></div>`:""}</div>`;
 }
 function renderPerdas(){
   const n=S.numeros, t=tipoDe(S);
   return `<div class="head"><div class="eyebrow">Etapa 3 de 5</div><h1>Quanto a empresa está deixando na mesa</h1>
-    <p>Comparamos o que sobra hoje com o que uma empresa do mesmo segmento, bem gerida, deixaria de lucro. A diferença é explicada pelos problemas que o próprio cliente acabou de reconhecer.</p></div>
+    <p>Monte a estrutura financeira do mês com o cliente. O raio-X mostra a margem, o ponto de equilíbrio e o capital de giro; as alavancas mostram quanto dá para recuperar.</p></div>
   <div class="nums">
     <div class="panel"><div class="grid2">
       ${moneyField("numeros.fat","Faturamento médio mensal")}
-      <div class="field full"><span class="lbl">No fim do mês, quanto sobra?</span>
-        <div class="seg">${RESULTADO.map(r=>`<button type="button" class="chip" data-restipo="${r.v}" aria-pressed="${n.resTipo===r.v}">${r.t}</button>`).join("")}</div>
-        ${n.resTipo==="naosei"?`<small>Não saber já é um diagnóstico. A perda passa a ser estimada pelos problemas identificados.</small>`:""}${flagHTML("numeros.resTipo")}</div>
-      ${n.resTipo==="lucro"||n.resTipo==="prejuizo"?moneyField("numeros.resultado",n.resTipo==="lucro"?"Quanto sobra por mês (lucro)":"Quanto falta por mês (prejuízo)"):""}
-      <div class="field full"><label for="f-ref">Margem de referência do segmento</label>
-        <div style="display:flex;align-items:center;gap:8px"><input class="inp mono" id="f-ref" data-ref inputmode="decimal" style="width:90px;text-align:right" value="${n.margemRef!=null?numBR(n.margemRef):""}" placeholder="${numBR(MARGEM_REF[t])}"><span class="mono">%</span></div>
-        <small>Quanto sobra, em média, numa empresa de ${SEGMENTOS[t].t} bem gerida. Padrão: ${numBR(MARGEM_REF[t])}%. Ajuste se conhecer a referência do setor do cliente.</small></div>
-      ${S.respostas.F3&&(S.respostas.F3.n==="b"||S.respostas.F3.n==="i")?moneyField("numeros.juros","Quanto paga por mês em juros e tarifas?","Opcional. Se deixar em branco, usamos uma estimativa."):""}
+      <div class="field full"><span class="lbl">Custos que variam com a venda (% do faturamento)</span></div>
+      ${pctField("numeros.cmv",CUSTO_NOME[t])}
+      ${pctField("numeros.imposto","Impostos sobre a venda")}
+      ${pctField("numeros.perdas","Perdas",{help:"Desperdício, quebra, validade, furto."})}
+      ${pctField("numeros.taxas","Taxas de cartão / maquininha")}
+      <div class="field full"><span class="lbl">Custos fixos (R$ por mês)</span></div>
+      ${moneyField("numeros.folha","Folha de pagamento","Salários, encargos e pró-labore.")}
+      ${moneyField("numeros.fixos","Outros custos fixos","Aluguel, contas, sistemas, contador.")}
+      ${moneyField("numeros.financeiros","Custos financeiros","Juros, tarifas bancárias, parcelas de empréstimo.")}
+      <div class="field full"><span class="lbl">Prazos médios (dias) <small style="font-weight:400;color:var(--muted)">— opcional, para o capital de giro</small></span></div>
+      ${pctField("numeros.pme","Estoque",{un:"dias",help:"Quanto tempo o produto fica parado."})}
+      ${pctField("numeros.pmr","Recebimento",{un:"dias",help:"Em quanto tempo recebe das vendas."})}
+      ${pctField("numeros.pmp","Pagamento",{un:"dias",help:"Em quanto tempo paga fornecedores."})}
       <div class="field full"><span class="lbl">Há quanto tempo a empresa está nessa situação?</span>
         <div class="seg">${TEMPOS.map(x=>`<button type="button" class="chip" data-tempo="${x.v}" aria-pressed="${n.tempo===x.v}">${x.t}</button>`).join("")}</div>${flagHTML("numeros.tempo")}</div>
     </div></div>
@@ -1312,13 +1285,13 @@ function renderPerdas(){
   </div>
   <div id="leaks">${leaksHTML()}</div>${navRow()}`;
 }
-function refreshPerdas(full){
+function refreshPerdas(){
   document.getElementById("gapcard").innerHTML=gapCardHTML();
-  if(full){document.getElementById("leaks").innerHTML=leaksHTML();return;}
   const c=calc(S);
-  c.vaz.forEach(v=>{const el=document.getElementById("vzv-"+v.k); if(el)el.textContent=brl(c.modo==="saudavel"?v.teto:v.valor);});
-  const o=document.getElementById("vz-outros"); if(o)o.textContent=brl(c.outros);
-  const t=document.getElementById("vz-total"); if(t)t.textContent=brl(c.modo==="saudavel"?c.extra:c.perda);
+  c.vaz.forEach(v=>{const el=document.getElementById("vzv-"+v.k); if(el)el.textContent=brl(v.valor);});
+  const t=document.getElementById("vz-total"); if(t)t.textContent=brl(c.perda);
+  const a=document.getElementById("vz-ano"); if(a)a.textContent=c.perdaAno!=null?brl(c.perdaAno)+" por ano":"";
+  const p=document.getElementById("pos"); if(p)p.innerHTML=posHTML(c);
 }
 function canaisHTML(){
   return `<article class="q"><div class="qtop"><div class="qid">—</div><div class="qbody">
@@ -1387,12 +1360,12 @@ function autoParecer(s){
   const c=calc(s), e=s.empresa, nome=e.nome||"A empresa", P=[];
   if(c.nota!=null) P.push(`${nome} está no nível ${c.mat.t.toLowerCase()} de maturidade de gestão, com nota ${dec(c.nota)} de 10.`+
     (c.melhor&&c.pior&&c.melhor.p!==c.pior.p?` O pilar mais forte é ${c.melhor.p} (${pct(c.melhor.v)}) e o maior potencial de melhoria está em ${c.pior.p} (${pct(c.pior.v)}).`:""));
-  if(c.modo==="margem") P.push(`Hoje ${c.lucro<0?`a operação dá prejuízo de ${brl(-c.lucro)} por mês`:`sobram ${brl(c.lucro)} por mês (${pct1(c.margem)} do faturamento)`}, enquanto ${SEGMENTOS[tipoDe(s)].bem} deixaria ${brl(c.lucroRef)} (${numBR(c.refPct)}%). São ${brl(c.perda)} deixados na mesa todo mês — ${brl(c.perdaAno)} em 12 meses.`);
-  else if(c.modo==="estimativa"&&c.perda) P.push(`A empresa não mede quanto sobra no fim do mês. Pelos problemas identificados no diagnóstico, estimamos ${brl(c.perda)} de resultado perdido por mês — ${brl(c.perdaAno)} em 12 meses.`);
-  else if(c.modo==="saudavel") P.push(`A margem atual (${pct1(c.margem)}) já está dentro da referência do segmento; os pontos do diagnóstico indicam até ${brl(c.extra)} por mês de resultado adicional.`);
-  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  if(c.temEstr) P.push(`Hoje a margem líquida é de ${pct1(c.margem)} (${c.status.t.toLowerCase()}), com resultado operacional de ${brl(c.ro)} por mês; a referência saudável para o segmento é ${c.par.saudavel}%.`+
+    (c.perda?` Só com ajustes em custo, perdas e taxas, há ${brl(c.perda)} por mês a recuperar — ${brl(c.perdaAno)} em 12 meses —, levando a margem para ${pct1(c.margemPos)}.`:"")+
+    (c.pe?` O ponto de equilíbrio está em ${brl(c.pe)} de faturamento por mês.`:""));
+  const val=v=>v.valor;
   const top=[...c.vaz].filter(v=>val(v)>0).sort((a,b)=>val(b)-val(a)).slice(0,3);
-  if(top.length) P.push(`Os maiores vazamentos estão em: ${lista(top.map(v=>lowerFirst(v.t)))}.`);
+  if(top.length) P.push(`As alavancas de ganho são: ${lista(top.map(v=>`${lowerFirst(v.t)} (${brl(v.valor)}/mês)`))}.`);
   const pr=c.crit.filter(x=>x.tipo==="Prioridade").slice(0,3);
   if(pr.length) P.push(`As prioridades de ação são: ${lista(pr.map(x=>lowerFirst(x.q.ponto)))}.`);
   const preoc=dorItens(s.dor.preocupa).join("; ").trim();
@@ -1453,7 +1426,7 @@ const FRENTES=[
 const QUAD={rapidos:{t:"Ganhos rápidos",d:"Alto impacto, pouco esforço — começar já."},estrut:{t:"Projetos estruturantes",d:"Alto impacto, exigem mais tempo — planejar e iniciar."},
   ajustes:{t:"Ajustes simples",d:"Impacto menor, fáceis de resolver — encaixar na rotina."},depois:{t:"Pode esperar",d:"Impacto menor e mais esforço — deixar para depois."}};
 function plano(s,c){
-  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  const val=v=>v.valor;
   const itens=c.crit.map(x=>({...x,reais:c.vaz.filter(v=>v.q===x.q.id).reduce((a,v)=>a+(val(v)||0),0),esf:ONDA[x.q.id]||2}));
   const maxR=Math.max(0,...itens.map(i=>i.reais));
   itens.forEach(i=>{ i.imp=(maxR?i.reais/maxR:0)*.5+(i.q.peso/3)*.3+(i.n==="b"?1:.5)*.2; i.alto=i.imp>=.5;
@@ -1480,19 +1453,14 @@ function dTable(cols,head,rows,lead=""){
   if(!rows.length) return `<div class="avoid">${lead}${th}</div>`;
   return `<div class="avoid">${lead}${th}${tr(rows[0])}</div>${rows.slice(1).map(r=>`<div class="avoid">${tr(r)}</div>`).join("")}`;
 }
-function resBars(c){
-  const max=Math.max(Math.abs(c.lucro),Math.abs(c.lucroPot),1);
-  const row=(lab,v,col)=>`<div class="rb"><span>${lab}</span><div class="rb-t"><i style="width:${Math.max(1.5,Math.abs(v)/max*100)}%;background:${col}"></i></div><b class="mono">${brl(v)}</b></div>`;
-  return `<div class="d-rbars avoid">${row(c.lucro<0?"Prejuízo hoje":"Sobra hoje",c.lucro,c.lucro<0?"#C9402F":"#7A7A7A")}${row("Referência do segmento",c.lucroPot,"#47C97E")}</div>`;
-}
 function reportHTML(s){
   /* Diagnóstico comercial: enxuto (cerca de 2 páginas). Clareza do problema, quantificação e urgência.
      O detalhamento (como fazer, tabela completa de pontos) fica para o trabalho do consultor. */
   const c=calc(s), e=s.empresa, n=s.numeros, P=plano(s,c);
   const hoje=dataBR(s.atualizadoEm||new Date().toISOString());
   const prox=proximoTxt(s), quem=e.decisor||"o empresário";
-  const temPerda=(c.modo==="margem"||c.modo==="estimativa")&&c.perda>0;
-  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  const temPerda=c.perda>0;
+  const val=v=>v.valor;
   const vz=[...c.vaz].filter(v=>val(v)>0).sort((a,b)=>val(b)-val(a));
   const topVz=vz.slice(0,4), restoVz=vz.slice(4).reduce((a,v)=>a+val(v),0)+(c.outros||0);
   const fala=["preocupa","seNada","impediu"].map(k=>dorItens(s.dor[k]).join(" … ").trim()).find(Boolean);
@@ -1506,27 +1474,34 @@ function reportHTML(s){
   </div>
 
   <section class="avoid"><h2>Resumo</h2>
-    <p class="ex-lead">${esc(e.nome||"A empresa")} está no nível <b>${c.mat?c.mat.t.toLowerCase():"—"}</b> de maturidade de gestão${temPerda?` e ${c.modo==="estimativa"?"perde, por estimativa,":"deixa"} <b class="ex-red">${brl(c.perda)} por mês</b> na mesa`:c.modo==="saudavel"?`, com margem dentro da referência e até <b>${brl(c.extra)}/mês</b> de resultado adicional possível`:""}.${P.achados.length?` Os pontos mais urgentes estão em ${lista(P.achados.map(i=>lowerFirst(i.q.ponto)))}.`:""}</p>
+    <p class="ex-lead">${esc(e.nome||"A empresa")} está no nível <b>${c.mat?c.mat.t.toLowerCase():"—"}</b> de maturidade de gestão${c.temEstr?`, com margem líquida de <b>${pct1(c.margem)}</b> (${c.status.t.toLowerCase()})`:""}${temPerda?` e deixa <b class="ex-red">${brl(c.perda)} por mês</b> na mesa`:""}.${P.achados.length?` Os pontos mais urgentes estão em ${lista(P.achados.map(i=>lowerFirst(i.q.ponto)))}.`:""}</p>
     <div class="d-k3">
       <div class="k3 hero"><div style="width:96px;flex:none">${gauge(c.nota==null?null:c.nota/10,"Nota geral",true)}</div>
         <div><div class="k">Nota de gestão</div>${c.mat?`<span class="pill ${c.mat.k}">${c.mat.t}</span>`:""}</div></div>
-      <div class="k3"><div class="k">${c.modo==="estimativa"?"Perda estimada por mês":"Deixando na mesa por mês"}</div><div class="v red">${temPerda?brl(c.perda):"—"}</div><div class="x">${temPerda?`${brl(c.perdaAno)} em 12 meses`:""}</div></div>
+      <div class="k3"><div class="k">Deixando na mesa por mês</div><div class="v red">${temPerda?brl(c.perda):"—"}</div><div class="x">${temPerda?`${brl(c.perdaAno)} em 12 meses`:""}</div></div>
       <div class="k3"><div class="k">Se esperar 3 meses</div><div class="v red">${temPerda?brl(c.perda*3):"—"}</div><div class="x">${temPerda?"perdidos antes de começar":""}</div></div>
     </div>
     ${fala?`<div class="d-quote one"><div class="qq">Nas palavras de ${esc(quem)}</div><p>“${esc(corta(fala,260))}”${s.dor.prioridade!=null?` <span class="prio">Prioridade ${s.dor.prioridade}/10</span>`:""}</p></div>`:""}
   </section>
 
-  ${temPerda||c.modo==="saudavel"&&c.extra?`<section class="avoid"><h2>Quanto a empresa está deixando na mesa</h2>
-    <div class="d-gap"><div><div class="lab">${c.modo==="margem"?"Diferença entre o lucro de hoje e o de uma empresa bem gerida do mesmo segmento":c.modo==="estimativa"?"Estimativa pelos problemas identificados (o lucro atual não é medido)":"Resultado adicional possível"}</div>
-      <div class="big">${brl(c.modo==="saudavel"?c.extra:c.perda)}<span style="font-size:14px;font-weight:400"> / mês</span></div>
-      ${c.porReal!=null?`<div class="lab" style="margin-top:8px">Para cada R$ 1 que sobra hoje, <b style="color:#fff">R$ ${reais(c.porReal)}</b> ficam na mesa.</div>`:""}</div>
+  ${c.temEstr?`<section class="avoid"><h2>Quanto a empresa está deixando na mesa</h2>
+    <div class="d-gap"><div><div class="lab">Ganho possível com ajustes em custo, perdas e taxas</div>
+      <div class="big">${brl(c.perda)}<span style="font-size:14px;font-weight:400"> / mês</span></div>
+      <div class="lab" style="margin-top:8px">${brl(c.perdaAno)} em 12 meses${temPerda&&c.acum!=null?` · já perdido (${n.tempo?TEMPOS.find(t=>t.v===n.tempo).t.toLowerCase():""}): <b style="color:#fff">${brl(c.acum)}</b>`:""}</div></div>
       <div class="rows">
-        ${c.modo==="margem"?`<div class="row"><span>Lucro de referência (${numBR(c.refPct)}%)</span><b>${brl(c.lucroRef)}</b></div>
-        <div class="row"><span>${c.lucro<0?"Prejuízo":"Lucro"} atual (${pct1(c.margem)})</span><b>${brl(c.lucro)}</b></div>`:""}
-        ${temPerda?`<div class="row"><span>Em 12 meses</span><b>${brl(c.perdaAno)}</b></div>`:""}
-        ${temPerda&&c.acum!=null?`<div class="row"><span>Já perdido (${n.tempo?TEMPOS.find(t=>t.v===n.tempo).t.toLowerCase():""})</span><b>${brl(c.acum)}</b></div>`:""}
+        <div class="row"><span>Margem líquida</span><b>${pct1(c.margem)} → ${pct1(c.margemPos)}</b></div>
+        <div class="row"><span>Resultado por mês</span><b>${brl(c.ro)} → ${brl(c.roPos)}</b></div>
+        <div class="row"><span>Ponto de equilíbrio</span><b>${c.pe!=null?brl(c.pe):"—"}</b></div>
+        ${c.necCap?`<div class="row"><span>Capital de giro necessário</span><b>${brl(c.necCap)} → ${brl(c.necCapPos)}</b></div>`:""}
       </div></div>
-    ${topVz.length?`<div class="d-vz"><div class="vz-h">Onde está vazando</div>${topVz.map(v=>`<div class="vz"><span>${esc(v.t)}</span><b>${brl(val(v))}</b></div>`).join("")}${restoVz>0?`<div class="vz"><span>Outros pontos</span><b>${brl(restoVz)}</b></div>`:""}</div>`:""}
+    <div class="d-faixa"><div class="dfx-h">Margem líquida × referência para ${esc(SEGMENTOS[tipoDe(s)].t)}</div>
+      ${(()=>{const par=c.par, max=Math.max(par.saudavel*1.6,(c.margemPos||0)*100+5,10), x=v=>Math.max(0,Math.min(100,v/max*100));
+        return `<div class="dfx-bar"><i style="left:0;width:${x(par.risco)}%;background:#F3C5BD"></i><i style="left:${x(par.risco)}%;width:${x(par.atencao)-x(par.risco)}%;background:#F5DFAE"></i><i style="left:${x(par.atencao)}%;right:0;background:#C2E8D2"></i>
+          <b class="dfx-m" style="left:${x(Math.max(0,c.margem*100))}%"><span>Hoje ${pct1(c.margem)}</span></b>
+          ${c.margemPos!=null&&c.perda>0?`<b class="dfx-m pos" style="left:${x(Math.max(0,c.margemPos*100))}%"><span>Com ajustes ${pct1(c.margemPos)}</span></b>`:""}</div>
+        <div class="dfx-l"><span>Risco até ${par.risco}%</span><span>Atenção até ${par.atencao}%</span><span>Saudável ${par.saudavel}%+</span></div>`;})()}
+    </div>
+    ${topVz.length?`<div class="d-vz"><div class="vz-h">Onde está o dinheiro</div>${topVz.map(v=>`<div class="vz"><span>${esc(v.t)}</span><b>${brl(val(v))}</b></div>`).join("")}${c.roi!=null?`<div class="vz"><span>Investimento de ${brl(c.invest)}</span><b style="color:var(--d-good)">se paga em ${Math.max(1,Math.round(c.payback))} dias</b></div>`:""}</div>`:""}
   </section>`:""}
 
   <section class="avoid"><h2>Desempenho por pilar</h2>
@@ -1548,7 +1523,7 @@ function reportHTML(s){
 
   ${prox?`<div class="d-next avoid"><b>Próximo passo:</b> ${esc(prox)}</div>`:""}
 
-  <div class="d-note">Números declarados por ${esc(quem)} na reunião, sem auditoria.${c.modo==="margem"?` Lucro de referência: margem de ${numBR(c.refPct)}%, o que costuma sobrar em ${SEGMENTOS[tipoDe(s)].bem}.`:""}${temPerda?" Valores por problema são estimativas conservadoras.":""} Escopo, responsáveis e indicadores de cada etapa são definidos no plano de trabalho.</div>
+  <div class="d-note">Números declarados por ${esc(quem)} na reunião, sem auditoria. Faixas de margem líquida para ${esc(SEGMENTOS[tipoDe(s)].t)}: risco até ${c.par.risco}%, atenção até ${c.par.atencao}%, saudável a partir de ${c.par.saudavel}%.${temPerda?` Ganhos estimados com melhorias de ${lista(c.vaz.filter(v=>v.p>0).map(v=>`${numBR(v.p)}% em ${lowerFirst(v.t).replace(/^otimização d[oe] |^redução de |^revisão de /,"")}`))} sobre o faturamento.`:""} Escopo, responsáveis e indicadores de cada etapa são definidos no plano de trabalho.</div>
   <div class="d-foot"><span>Berry · Diagnóstico empresarial</span><span>${esc(e.nome||"")} · ${hoje}</span></div>
 </div>`;
 }
@@ -1679,8 +1654,8 @@ async function copiarResumo(){
   const c=calc(S), e=S.empresa;
   const linhas=[`*Diagnóstico Berry — ${e.nome||"Empresa"}*`,``,
     `Nota geral: *${dec(c.nota)}/10* (maturidade ${c.mat?c.mat.t.toLowerCase():"—"})`,
-    c.perda?`${c.modo==="estimativa"?"Perda estimada":"Deixando na mesa"}: *${brl(c.perda)}/mês* (${brl(c.perdaAno)} em 12 meses)`:null,
-    c.modo==="margem"?`Hoje sobram ${brl(c.lucro)} (${pct1(c.margem)}); a referência do segmento é ${brl(c.lucroRef)} (${numBR(c.refPct)}%).`:null,
+    c.temEstr?`Margem líquida: *${pct1(c.margem)}* (${c.status.t.toLowerCase()}; referência ${c.par.saudavel}%)`:null,
+    c.perda?`Deixando na mesa: *${brl(c.perda)}/mês* (${brl(c.perdaAno)} em 12 meses)`:null,
     c.melhor?`Melhor área: ${c.melhor.p} (${pct(c.melhor.v)})`:null,
     c.pior?`Maior potencial de melhoria: ${c.pior.p} (${pct(c.pior.v)})`:null,``,
     c.crit.length?`*Prioridades:*`:null,
@@ -1704,9 +1679,16 @@ const IA_CAMPOS = [
   {k:"empresa.segmento",path:"empresa.segmento",rot:"Segmento",tipo:"opcao",ops:()=>SUBSEG[tipoDe(S)]},
   {k:"empresa.canais",path:"empresa.canais",rot:"Canais de venda",tipo:"lista",ops:()=>CANAIS},
   {k:"numeros.faturamento_mensal",path:"numeros.fat",rot:"Faturamento mensal",tipo:"reais"},
-  {k:"numeros.resultado_tipo",path:"numeros.resTipo",rot:"Quanto sobra (lucro/prejuízo)",tipo:"opcao",ops:()=>["lucro","prejuizo","naosei"]},
-  {k:"numeros.resultado_mensal",path:"numeros.resultado",rot:"Lucro/prejuízo mensal",tipo:"reais"},
-  {k:"numeros.juros_mensais",path:"numeros.juros",rot:"Juros e tarifas por mês",tipo:"reais"},
+  {k:"numeros.cmv_pct",path:"numeros.cmv",rot:"Custo principal (CMV/CPV) %",tipo:"pct"},
+  {k:"numeros.imposto_pct",path:"numeros.imposto",rot:"Impostos sobre a venda %",tipo:"pct"},
+  {k:"numeros.perdas_pct",path:"numeros.perdas",rot:"Perdas %",tipo:"pct"},
+  {k:"numeros.taxas_pct",path:"numeros.taxas",rot:"Taxas de cartão %",tipo:"pct"},
+  {k:"numeros.folha_mensal",path:"numeros.folha",rot:"Folha de pagamento",tipo:"reais"},
+  {k:"numeros.fixos_mensais",path:"numeros.fixos",rot:"Outros custos fixos",tipo:"reais"},
+  {k:"numeros.financeiros_mensais",path:"numeros.financeiros",rot:"Custos financeiros",tipo:"reais"},
+  {k:"numeros.prazo_estoque",path:"numeros.pme",rot:"Prazo médio de estoque",tipo:"dias"},
+  {k:"numeros.prazo_recebimento",path:"numeros.pmr",rot:"Prazo médio de recebimento",tipo:"dias"},
+  {k:"numeros.prazo_pagamento",path:"numeros.pmp",rot:"Prazo médio de pagamento",tipo:"dias"},
   {k:"numeros.tempo_situacao",path:"numeros.tempo",rot:"Há quanto tempo nessa situação",tipo:"opcao",ops:()=>[6,12,24,36]},
   {k:"dor.impediu",path:"dor.impediu",rot:"O que impediu",tipo:"texto"},
   {k:"dor.tentou",path:"dor.tentou",rot:"O que já foi tentado",tipo:"texto"},
@@ -1744,9 +1726,14 @@ CAMPOS (chave → o que preencher)
 - "empresa.segmento": uma destas opções exatas: ${SUBSEG[t].join(" | ")}.
 - "empresa.canais": lista (array) com as opções exatas que o cliente citou como forma de vender hoje: ${CANAIS.join(" | ")}.
 - "numeros.faturamento_mensal": faturamento médio MENSAL em reais, como número (ex.: 25000). Valor anual, faixa ("uns 20 a 30 mil") ou estimativa vaga = "duvida".
-- "numeros.resultado_tipo": "lucro" (sobra dinheiro no mês), "prejuizo" (falta) ou "naosei" (ele disse que não sabe quanto sobra).
-- "numeros.resultado_mensal": quanto sobra (ou falta) por mês, em reais, como número positivo.
-- "numeros.juros_mensais": quanto paga por mês em juros e tarifas, em reais.
+- "numeros.cmv_pct": ${CUSTO_NOME[t]} em % do faturamento (número, ex.: 38). Se ele disser em reais, só converta se o faturamento mensal também tiver sido dito; senão, "duvida".
+- "numeros.imposto_pct": impostos sobre a venda, em % do faturamento (ex.: 6 para Simples de 6%).
+- "numeros.perdas_pct": perdas (desperdício, quebra, validade, furto) em % do faturamento.
+- "numeros.taxas_pct": taxas de cartão/maquininha em % do faturamento.
+- "numeros.folha_mensal": folha de pagamento por mês (salários, encargos, pró-labore), em reais.
+- "numeros.fixos_mensais": outros custos fixos por mês (aluguel, contas, sistemas, contador), em reais.
+- "numeros.financeiros_mensais": custos financeiros por mês (juros, tarifas, parcelas de empréstimo), em reais.
+- "numeros.prazo_estoque" / "numeros.prazo_recebimento" / "numeros.prazo_pagamento": prazos médios em dias (número).
 - "numeros.tempo_situacao": há quanto tempo a empresa está nessa situação, em meses — um destes números: 6, 12, 24 ou 36 (36 = 3 anos ou mais). Use o mais próximo somente se ele disser um tempo.
 - "dor.impediu", "dor.tentou", "dor.preocupa", "dor.seNada": as palavras do próprio cliente, em citação (pode juntar trechos com " … "), sem reescrever nem resumir:
    impediu = ${DOR[0].q}
@@ -1790,6 +1777,8 @@ function validarIA(c,v){
   if(v==null) return undefined;
   if(c.tipo==="texto"){const x=String(v).trim(); return x?x:undefined;}
   if(c.tipo==="reais"){const n=typeof v==="number"?v:parseMoney(v); return n!=null&&n>=0?Math.round(n):undefined;}
+  if(c.tipo==="pct"){const n=typeof v==="number"?v:parseNum(v); return n!=null&&n>=0&&n<=100?n:undefined;}
+  if(c.tipo==="dias"){const n=typeof v==="number"?v:parseNum(v); return n!=null&&n>=0&&n<=365?Math.round(n):undefined;}
   if(c.tipo==="nota"){const n=Number(v); return Number.isInteger(n)&&n>=0&&n<=10?n:undefined;}
   if(c.tipo==="opcao"){const ops=c.ops(); const hit=ops.find(o=>String(o)===String(v)); return hit===undefined?undefined:hit;}
   if(c.tipo==="lista"){const ops=c.ops(); const arr=(Array.isArray(v)?v:[v]).map(String).filter(x=>ops.includes(x)); return arr.length?arr:undefined;}
@@ -1844,7 +1833,7 @@ function atualizarBarraIA(){
     <span class="ia-n"><i style="background:var(--line-strong)"></i>${c.nm} não falados</span>
     ${c.duv+c.nm?`<button class="btn" type="button" data-ia-pend>Revisar pendências</button>`:`<span>Tudo revisado.</span>`}</div>`;
 }
-const passoDe=path=>path==="empresa.canais"||path.startsWith("respostas.")?1:path.startsWith("empresa.")?0:path.startsWith("numeros.")?2:3;
+const passoDe=path=>path.startsWith("numeros.")?2:path==="empresa.canais"||path.startsWith("respostas.")?1:path.startsWith("empresa.")?0:path.startsWith("numeros.")?2:3;
 function rotuloIA(path){
   if(path.startsWith("respostas.")){const q=qsDe(S).find(x=>"respostas."+x.id===path); return q?`${q.id} · ${q.q}`:path;}
   return (IA_CAMPOS.find(c=>c.path===path)||{}).rot||path;
@@ -1921,7 +1910,6 @@ function hydrate(it){
   const s=Object.assign(blank(),it);
   s.numeros=Object.assign(blank().numeros,it.numeros||{});
   if(s.numeros.fat==null&&it.numeros&&it.numeros.atual!=null) s.numeros.fat=it.numeros.atual;
-  s.vaz=it.vaz||{};
   return s;
 }
 async function listarTodos(){
@@ -1967,7 +1955,6 @@ document.addEventListener("click",async ev=>{
   if(t.hasAttribute("data-multi")){const path=t.dataset.multi; limparFlag(path); let a=getPath(S,path); if(!Array.isArray(a)){a=[]; setPath(S,path,a);}
     const k=a.indexOf(t.dataset.val); k>=0?a.splice(k,1):a.push(t.dataset.val); t.setAttribute("aria-pressed",k<0); afterPick(); touch(); return;}
   if(t.dataset.restipo){limparFlag("numeros.resTipo");S.numeros.resTipo=t.dataset.restipo; touch(); render(); document.querySelector('[data-money="numeros.resultado"]')?.focus(); return;}
-  if(t.dataset.vazReset){delete S.vaz[t.dataset.vazReset]; refreshPerdas(true); touch(); return;}
   if(t.dataset.prio!=null){limparFlag("dor.prioridade");S.dor.prioridade=+t.dataset.prio; document.querySelectorAll("[data-prio]").forEach(b=>b.setAttribute("aria-pressed",b===t)); afterPick(); touch(); return;}
   if(t.dataset.na){limparFlag("respostas."+t.dataset.na);const r=S.respostas[t.dataset.na]||(S.respostas[t.dataset.na]={nota:""}); r.n=r.n==="na"?null:"na"; refreshQ(t.dataset.na); return;}
   if(t.dataset.clear){limparFlag("respostas."+t.dataset.clear);const r=S.respostas[t.dataset.clear]; if(r)r.n=null; refreshQ(t.dataset.clear); return;}
@@ -2000,13 +1987,12 @@ document.addEventListener("input",ev=>{
   if(t.dataset.note){const r=S.respostas[t.dataset.note]||(S.respostas[t.dataset.note]={n:null}); r.nota=t.value; touch(); return;}
   if(t.dataset.money){limparFlag(t.dataset.money); const v=parseMoney(t.value); setPath(S,t.dataset.money,v);
     const pos=t.value.length-t.selectionStart; t.value=fmtMoneyInput(v); const np=Math.max(0,t.value.length-pos); t.setSelectionRange(np,np);
-    refreshPerdas(true); touch(); return;}
-  if(t.hasAttribute("data-ref")){S.numeros.margemRef=parseNum(t.value); refreshPerdas(true); touch(); return;}
-  if(t.dataset.vaz){const v=parseNum(t.value); if(v==null)delete S.vaz[t.dataset.vaz]; else S.vaz[t.dataset.vaz]=Math.min(100,v); refreshPerdas(); touch(); return;}
+    refreshPerdas(); touch(); return;}
+  if(t.dataset.pct){limparFlag(t.dataset.pct); setPath(S,t.dataset.pct,parseNum(t.value)); refreshPerdas(); touch(); return;}
 });
-document.addEventListener("focusout",ev=>{
-  if(ev.target.dataset&&ev.target.dataset.vaz!=null)
-    setTimeout(()=>{const l=document.getElementById("leaks"); if(l&&!l.contains(document.activeElement)) refreshPerdas(true);},150);
+document.addEventListener("focusout",ev=>{ /* ao sair de uma melhoria, reavalia o aviso "maior que o atual" */
+  if(ev.target.dataset&&ev.target.dataset.pct&&ev.target.dataset.pct.startsWith("numeros.g"))
+    setTimeout(()=>{const l=document.getElementById("leaks"); if(l&&!l.contains(document.activeElement)) l.innerHTML=leaksHTML();},150);
 });
 document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&drawerOpen){drawerOpen=false; renderDrawer();} if(ev.key==="Escape"&&iaOpen){iaOpen=false; renderIA();}});
 
