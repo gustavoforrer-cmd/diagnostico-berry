@@ -523,11 +523,11 @@ const PERGUNTAS = [
    pi:"Existe esforço, mas sem estratégia e medição não dá para saber o que traz venda.",
    sol:"Otimizar o Google Meu Negócio, criar calendário de conteúdo e definir verba de mídia com meta de retorno."},
   {id:"O1",pilar:"Operacional",peso:3,
-   q:"Os processos são definidos e a equipe sabe o seu papel? Ou tudo passa pelo dono?",
+   q:"Os processos são documentados (passo a passo, checklists)? Ou tudo depende do dono?",
    dig:"Se você tirasse 15 dias de férias, a empresa funcionaria igual?",
-   b:"Tudo depende do dono; nada documentado.",
-   i:"Alguns processos claros, mas o dono ainda é o gargalo.",
-   a:"Processos documentados, papéis e checklists definidos.",
+   b:"Nada documentado; o dono resolve tudo e é chamado para tudo.",
+   i:"Alguns processos claros, mas não documentados; o dono ainda é o gargalo.",
+   a:"Processos-chave documentados com checklists; a operação roda sem o dono.",
    ponto:"Processos e dependência do dono",
    pb:"O dono é o gargalo: o tempo que deveria ir para fazer o negócio crescer é consumido apagando incêndios.",
    pi:"A dependência parcial do dono limita a capacidade de crescer sem perder qualidade.",
@@ -541,7 +541,47 @@ const PERGUNTAS = [
    ponto:"Qualidade da entrega",
    pb:"Erros recorrentes geram retrabalho, custo e clientes perdidos — e reduzem as indicações.",
    pi:"Tratar caso a caso resolve o sintoma, mas a causa volta a acontecer.",
-   sol:"Padronizar a entrega com checklists, registrar ocorrências e tratar a causa raiz."}
+   sol:"Padronizar a entrega com checklists, registrar ocorrências e tratar a causa raiz."},
+  {id:"O3",pilar:"Operacional",peso:2,
+   q:"A empresa tem estrutura definida — quem faz o quê e quem responde a quem?",
+   dig:"Se eu perguntasse para cada pessoa da equipe qual é a principal responsabilidade dela, todos responderiam o mesmo que você?",
+   b:"Sem funções definidas; todo mundo faz um pouco de tudo e tudo sobe para o dono.",
+   i:"Funções conhecidas na prática, mas sem descrição nem responsável claro por área.",
+   a:"Organograma, funções descritas e um responsável por cada área ou resultado.",
+   ponto:"Estrutura, papéis e responsabilidades",
+   pb:"Sem papéis definidos, tarefas caem no vão entre as pessoas e o dono vira o destino de toda decisão.",
+   pi:"As funções existem na prática, mas sem um dono claro por resultado ninguém responde quando algo dá errado.",
+   sol:"Desenhar o organograma, descrever as funções-chave e definir um responsável e um indicador para cada área."},
+  {id:"O4",pilar:"Operacional",peso:2,
+   q:"Como a empresa contrata e treina as pessoas? A rotatividade é alta?",
+   dig:"Quanto tempo leva para alguém novo trabalhar bem sem precisar de você? E quantas pessoas saíram no último ano?",
+   b:"Contrata por indicação ou na urgência e treina \"no dia a dia\", sem roteiro; muita gente entra e sai.",
+   i:"Algum critério de contratação e um treinamento inicial, mas informal e dependente de quem ensina.",
+   a:"Perfil da vaga definido, processo seletivo, integração com roteiro e treinamento contínuo.",
+   ponto:"Contratação, integração e treinamento",
+   pb:"Contratação na urgência e treinamento improvisado geram rotatividade alta: a empresa paga para treinar quem vai embora.",
+   pi:"Sem roteiro de integração, cada pessoa aprende de um jeito e a qualidade depende de quem ensinou.",
+   sol:"Definir o perfil de cada vaga, estruturar o processo seletivo e criar um roteiro de integração e treinamento por função."},
+  {id:"O5",pilar:"Operacional",peso:3,
+   q:"A equipe tem metas, acompanhamento e feedback?",
+   dig:"Hoje, cada pessoa sabe o que se espera dela no mês — e como está indo?",
+   b:"Sem metas individuais nem acompanhamento; a cobrança só acontece quando algo dá errado.",
+   i:"Algumas metas ou conversas pontuais, sem rotina de acompanhamento nem feedback estruturado.",
+   a:"Metas por pessoa ou área, reuniões periódicas de acompanhamento e feedback regular.",
+   ponto:"Gestão de desempenho da equipe",
+   pb:"Sem metas e acompanhamento, a equipe não sabe o que é um bom trabalho — e o desempenho fica abaixo do potencial sem ninguém perceber.",
+   pi:"Conversas pontuais não criam ritmo: o desempenho oscila e os problemas aparecem tarde.",
+   sol:"Definir metas por área ou pessoa, criar uma reunião semanal de acompanhamento com indicadores e uma rotina de feedback mensal."},
+  {id:"O6",pilar:"Operacional",peso:2,
+   q:"A remuneração da equipe está ligada a resultado (comissão, bônus, metas)?",
+   dig:"Se a empresa vender 30% a mais no mês que vem, o que muda para a equipe?",
+   b:"Só salário fixo; nada liga o ganho da equipe ao resultado da empresa.",
+   i:"Existe comissão ou bônus, mas sem regra clara ou sem relação com as metas.",
+   a:"Remuneração variável com regras claras, ligada às metas de cada área.",
+   ponto:"Remuneração e engajamento da equipe",
+   pb:"Sem nada que ligue o ganho da equipe ao resultado, o esforço extra depende só da boa vontade — e os melhores vão embora.",
+   pi:"Bônus sem regra clara gera sensação de injustiça e não direciona o esforço para o que importa.",
+   sol:"Criar uma política de remuneração variável simples, com regras claras e ligada às metas de cada área."}
 ];
 
 /* VAZAMENTOS: quanto de resultado a empresa perde por mês, em % do faturamento.
@@ -552,6 +592,8 @@ const VAZAMENTOS = [
   {k:"clientes",q:"C4",t:"Clientes que não voltam",d:"Recompra que deixa de acontecer por falta de relacionamento com a base.",b:3,i:1.5},
   {k:"perdas",q:"E2",t:"Perdas não medidas",d:"Validade, quebra, furto e erros que saem direto do lucro.",b:3,i:1.5},
   {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2.5,i:1.25},
+  {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
+  {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
   {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true},
   {k:"mix",q:"P2",t:"Venda adicional não feita",d:"Ticket médio abaixo do potencial e mix menos rentável.",b:1.5,i:0.75},
   {k:"estoque",q:"E1",t:"Estoque desorganizado",d:"Venda perdida por falta de produto e dinheiro parado em excesso.",b:1.5,i:0.75},
@@ -570,8 +612,8 @@ const SEGMENTOS = {
   servicos:{t:"Serviços",ex:"Clínica, agência, escritório, prestador",bem:"uma empresa de serviços bem gerida"}
 };
 const PILAR_NOME = {
-  industria:{"Estoque + Perdas":"Matéria-prima + Perdas","Operacional":"Produção"},
-  alimentacao:{"Estoque + Perdas":"Insumos + Desperdício","Operacional":"Cozinha + Operação"},
+  industria:{"Estoque + Perdas":"Matéria-prima + Perdas"},
+  alimentacao:{"Estoque + Perdas":"Insumos + Desperdício"},
   servicos:{"Estoque + Perdas":"Capacidade + Recebimento"}
 };
 const OVR = {
@@ -645,6 +687,7 @@ const OVR = {
         pb:"Matéria-prima que vira refugo é dinheiro jogado fora — e sem medir ninguém sabe quanto.",
         pi:"Sem medição por etapa não dá para saber onde o processo desperdiça.",
         sol:"Medir rendimento e refugo por produto e etapa, definir meta de perda e padronizar o processo nos pontos críticos."},
+    O4:{dig:"Quanto tempo leva para um operador novo produzir sem erro e sem retrabalho? E quantas pessoas saíram da fábrica no último ano?"},
     O1:{q:"Existe planejamento e controle da produção (PCP)?",
         dig:"Quantas vezes no último mês a produção foi reorganizada às pressas por causa de um pedido urgente?",
         b:"Produz conforme aparece; o dono decide tudo no dia a dia.",
@@ -720,6 +763,7 @@ const OVR = {
         pb:"Nota baixa ou perfil abandonado faz o cliente escolher o concorrente antes mesmo de provar.",
         pi:"Sem responder avaliações e sem constância, a reputação fica à mercê do último cliente insatisfeito.",
         sol:"Otimizar Google Meu Negócio e perfis dos apps, responder todas as avaliações e criar um calendário de conteúdo com fotos dos pratos."},
+    O4:{dig:"Quanto tempo leva para um cozinheiro ou atendente novo trabalhar no padrão da casa? E quantas pessoas saíram no último ano?"},
     O1:{q:"Os processos da cozinha e do atendimento são definidos? Ou tudo passa pelo dono?",
         dig:"Se você ficasse 15 dias fora, os pratos sairiam iguais e o caixa fecharia certo?"},
     O2:{q:"O preparo é padronizado e o tempo de entrega é controlado?",
@@ -785,6 +829,7 @@ const OVR = {
     M2:{q:"Como a empresa é encontrada (Google, Instagram, LinkedIn, conteúdo)?",
         dig:"Quantos clientes novos vieram do digital no último trimestre?",
         sol:"Otimizar Google Meu Negócio e perfis, produzir conteúdo que mostre autoridade (casos, antes e depois) e definir verba de mídia com meta de retorno."},
+    O4:{dig:"Quanto tempo leva para um profissional novo atender sozinho no padrão da empresa? E quantas pessoas saíram no último ano?"},
     O2:{q:"A entrega do serviço é padronizada (escopo, checklist, prazos)?",
         dig:"Qual foi a última reclamação de cliente e o que a causou?",
         b:"Cada profissional entrega do seu jeito; prazos estouram.",
@@ -805,6 +850,8 @@ const VAZ_SEG = {
     {k:"atendimento",q:"O2",t:"Vendas perdidas no atendimento",d:"Clientes que entram e saem sem comprar por falta de padrão de atendimento.",b:2,i:1},
     {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Vendas que se perdem por falta de follow-up.",b:2,i:1},
     {k:"mix",q:"P2",t:"Mix e giro mal geridos",d:"Capital em itens de baixa margem e baixo giro.",b:1.5,i:0.75},
+    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
+    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
     {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
   ],
   industria:[
@@ -816,6 +863,8 @@ const VAZ_SEG = {
     {k:"followup",q:"C3",t:"Orçamentos sem retorno",d:"Pedidos que se perdem por falta de follow-up.",b:2,i:1},
     {k:"retrabalho",q:"O2",t:"Retrabalho e devoluções",d:"Custo de refazer, repor e perder cliente por falha de qualidade.",b:1.5,i:0.75},
     {k:"mix",q:"P2",t:"Mix com produtos de baixa margem",d:"Capacidade da fábrica gasta com itens que pouco contribuem.",b:1.5,i:0.75},
+    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
+    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
     {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
   ],
   alimentacao:[
@@ -826,6 +875,8 @@ const VAZ_SEG = {
     {k:"estoque",q:"E1",t:"Compras sem controle",d:"Insumo que falta no serviço ou vence na câmara.",b:2,i:1},
     {k:"mix",q:"P2",t:"Cardápio e venda adicional",d:"Pedidos sem bebida, sobremesa ou combo e itens de baixa margem em destaque.",b:1.5,i:0.75},
     {k:"retrabalho",q:"O2",t:"Erros de preparo e atrasos",d:"Pratos refeitos, pedidos devolvidos e reembolsos.",b:1.5,i:0.75},
+    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
+    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
     {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
   ],
   servicos:[
@@ -836,13 +887,16 @@ const VAZ_SEG = {
     {k:"followup",q:"C3",t:"Propostas sem retorno",d:"Negociações que esfriam por falta de follow-up.",b:3,i:1.5},
     {k:"retrabalho",q:"O2",t:"Retrabalho na entrega",d:"Horas gastas refazendo trabalho que o cliente não paga.",b:2,i:1},
     {k:"mix",q:"P2",t:"Serviços complementares não vendidos",d:"Ticket abaixo do potencial por falta de pacotes e recorrência.",b:1.5,i:0.75},
+    {k:"desempenho",q:"O5",t:"Equipe sem metas nem acompanhamento",d:"Produtividade abaixo do potencial por falta de metas, rotina e feedback.",b:2,i:1},
+    {k:"rotatividade",q:"O4",t:"Rotatividade e treinamento improvisado",d:"Custo de contratar, treinar e perder pessoas — e os erros de quem aprendeu sozinho.",b:1.5,i:0.75},
     {k:"juros",q:"F3",t:"Juros e tarifas",d:"Custo de girar a empresa com crédito caro.",b:1.5,i:0.75,money:true}
   ]
 };
 const tipoDe=s=>s.empresa.tipo||"comercio";
 /* Margem líquida de referência (% do faturamento) de uma empresa bem gerida em cada tipo de negócio. Editável na reunião. */
 const MARGEM_REF = {comercio:10,industria:15,alimentacao:12,servicos:20};
-const PL=(s,p)=>(PILAR_NOME[tipoDe(s)]||{})[p]||p;
+const PILAR_PADRAO={"Operacional":"Pessoas e Processos"};
+const PL=(s,p)=>(PILAR_NOME[tipoDe(s)]||{})[p]||PILAR_PADRAO[p]||p;
 function qsDe(s){const o=OVR[tipoDe(s)]||{}; return PERGUNTAS.map(q=>({...q,...(o[q.id]||{}),pilarNome:PL(s,q.pilar)}));}
 const vazDe=s=>VAZ_SEG[tipoDe(s)]||VAZAMENTOS;
 
@@ -877,7 +931,7 @@ const consultorSalvo=()=>{try{return localStorage.getItem("berry-consultor")||""
 const NIVEL = {b:{t:"Básico",p:1},i:{t:"Intermediário",p:2},a:{t:"Avançado",p:3}};
 const STEPS = [
   {t:"Empresa",s:"Quem é o cliente"},
-  {t:"Diagnóstico",s:"15 perguntas"},
+  {t:"Diagnóstico",s:PERGUNTAS.length+" perguntas"},
   {t:"Quanto está perdendo",s:"Resultado deixado na mesa"},
   {t:"Dor e urgência",s:"Nas palavras do cliente"},
   {t:"Resultado",s:"Documento para o cliente"}
@@ -895,7 +949,7 @@ function exemplo(){
   const s=blank(); s.id="exemplo"; s.exemplo=true;
   s.empresa={nome:"Panificadora Muriel",tipo:"industria",segmento:"Alimentos e bebidas",decisor:"Muriel",cargo:"Sócio / fundador",funcionarios:"6 a 20",canais:["Loja física","Indicação / boca a boca","WhatsApp"],consultor:"Consultor Berry"};
   s.numeros={fat:25000,resTipo:"lucro",resultado:1500,juros:600,margemRef:null,tempo:12};
-  const r={F1:"i",F2:"b",F3:"b",P1:"b",P2:"i",E1:"i",E2:"b",C1:"b",C2:"b",C3:"i",C4:"b",M1:"i",M2:"b",O1:"b",O2:"a"};
+  const r={F1:"i",F2:"b",F3:"b",P1:"b",P2:"i",E1:"i",E2:"b",C1:"b",C2:"b",C3:"i",C4:"b",M1:"i",M2:"b",O1:"b",O2:"a",O3:"b",O4:"i",O5:"b",O6:"b"};
   for(const k in r) s.respostas[k]={n:r[k]};
   s.dor={impediu:"Não consigo sair da produção para vender. Fico o dia inteiro no forno.",tentou:"Já paguei impulsionamento no Instagram, mas não vi retorno e parei.",
     preocupa:"Trabalho muito e no fim do mês não sobra quase nada.",seNada:"Vou continuar esgotada e posso ter que fechar uma das frentes de venda.",prioridade:9};
