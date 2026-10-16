@@ -321,6 +321,62 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.45}
 .d-parecer{border:1px solid var(--d-line);border-radius:10px;padding:16px 18px;white-space:pre-wrap}
 .d-next{margin-top:10px;background:var(--d-soft);border-radius:10px;padding:14px 18px}
 .d-next b{color:var(--d-ink);font-family:var(--display);font-weight:500}
+.d-intro{margin:-4px 0 12px;color:var(--d-muted);font-size:12.5px}
+.d-exec{margin-top:24px}
+.ex-lead{font-size:15px;line-height:1.55;margin:0 0 14px;color:var(--d-ink)}
+.ex-lead b{font-family:var(--display);font-weight:500}
+.ex-red{color:var(--d-bad)}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ex-grid>div{background:var(--d-soft);border-radius:10px;padding:14px 16px}
+.ex-k{font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);margin-bottom:8px}
+.ex-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.ex-list b{font-family:var(--display);font-weight:500}
+.ex-list span{color:var(--d-muted);font-size:12px}
+.ex-r{color:var(--d-bad)!important;font-family:var(--display);font-weight:500;font-size:12px!important;white-space:nowrap}
+.ex-p{margin:0;font-size:12.5px}
+.ex-wait{margin-top:12px;padding-top:10px;border-top:1px solid var(--d-line);font-size:12.5px}
+.ex-wait b{color:var(--d-bad);font-family:var(--display);font-weight:500}
+.d-wait{margin-top:12px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:8px;align-items:stretch}
+.w-h{font-family:var(--display);font-weight:500;font-size:12.5px;display:flex;align-items:center;padding-right:6px}
+.w-t{border:1px solid var(--d-line);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;font-size:11px;color:var(--d-muted)}
+.w-t b{font-family:var(--display);font-weight:500;font-size:16px;color:var(--d-bad)}
+.d-fr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fr{border:1px solid var(--d-line);border-top:3px solid var(--d-gray);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:12px}
+.fr.crit{border-top-color:var(--d-bad)}.fr.aten{border-top-color:var(--d-warn)}.fr.ok{border-top-color:var(--d-good)}
+.fr-top{display:flex;justify-content:space-between;align-items:center}
+.fr-st{font-family:var(--display);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.fr.crit .fr-st{color:var(--d-bad)}.fr.aten .fr-st{color:var(--d-warn)}.fr.ok .fr-st{color:var(--d-good)}
+.fr-n{font-family:var(--display);font-weight:500;color:var(--d-muted)}
+.fr-t{font-family:var(--display);font-weight:500;font-size:14.5px}
+.fr-o{color:var(--d-muted);line-height:1.45}
+.fr-r{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--d-line);padding-top:8px;margin-top:auto}
+.fr-r span{color:var(--d-muted)}.fr-r b{font-family:var(--display);font-weight:500;font-size:15px;color:var(--d-bad)}
+.fr-c{display:flex;flex-direction:column;gap:2px;color:var(--d-muted)}
+.fr-c b{color:var(--d-ink);font-weight:500}
+.d-mx{display:grid;grid-template-columns:22px 1fr;grid-template-rows:auto auto;gap:6px}
+.mx-y{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);text-align:center;font-family:var(--display)}
+.mx-x{grid-column:2;text-align:right;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--d-muted);font-family:var(--display)}
+.mx-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mx-q{border-radius:10px;padding:12px 14px;min-height:110px;display:flex;flex-direction:column;gap:6px;background:var(--d-soft)}
+.q-rapidos{background:#E8F6EE;border:1px solid #BFE6CF}.q-estrut{background:#EEF1FB;border:1px solid #CBD3F0}
+.mx-h{font-family:var(--display);font-weight:500;font-size:13px}
+.q-rapidos .mx-h{color:var(--d-good)}.q-estrut .mx-h{color:var(--d-blue)}
+.mx-d{font-size:11px;color:var(--d-muted);margin-bottom:2px}
+.mx-i{display:flex;justify-content:space-between;gap:10px;font-size:12px;background:#fff;border-radius:6px;padding:5px 8px}
+.mx-i b{font-family:var(--display);font-weight:500;white-space:nowrap;color:var(--d-bad)}
+.mx-v{color:var(--d-muted);font-size:12px}
+.d-road{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rd{border:1px solid var(--d-line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px}
+.rd-h{display:flex;gap:10px;align-items:center}
+.rd-k{width:24px;height:24px;border-radius:50%;background:#05060C;color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:500;font-size:12px;flex:none}
+.rd-t{font-family:var(--display);font-weight:500;font-size:13px}
+.rd-n{color:var(--d-muted);font-size:11.5px}
+.rd ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:3px}
+.rd-v{margin:0;color:var(--d-muted)}
+.rd-f{margin-top:auto;border-top:1px solid var(--d-line);padding-top:8px;color:var(--d-muted);line-height:1.45}
+.rd-f b{color:var(--d-ink);font-weight:500}
+.d-prem ul{margin:0;padding-left:18px;color:var(--d-muted);font-size:11.5px;display:flex;flex-direction:column;gap:3px}
+.d-prem h2{font-size:13px}
 .d-foot{margin-top:30px;padding-top:12px;border-top:1px solid var(--d-line);display:flex;justify-content:space-between;font-size:11px;color:var(--d-muted)}
 .avoid{break-inside:avoid;page-break-inside:avoid}
 #pdf-stage{position:fixed;left:-10000px;top:0;width:794px}
@@ -1354,6 +1410,39 @@ function gauge(v,label,big){
   </svg>`;
 }
 
+/* ---------- plano de ação (o quê, quanto e em que ordem — o "como" fica para o projeto) ---------- */
+/* Onda do roteiro de 90 dias = também o esforço (1 baixo, 2 médio, 3 alto). */
+const ONDA={F1:1,F2:1,F3:2,P1:1,P2:2,E1:2,E2:1,C1:1,C2:3,C3:2,C4:2,M1:3,M2:2,O1:3,O2:2,O3:1,O4:3,O5:1,O6:3};
+const ONDAS=[
+  {t:"Dias 1 a 30",n:"Enxergar e estancar",fim:"Números do negócio visíveis, metas definidas e os maiores ralos de margem fechados."},
+  {t:"Dias 31 a 60",n:"Organizar e implantar",fim:"Processos e rotinas funcionando, perdas sob controle e equipe com papéis claros."},
+  {t:"Dias 61 a 90",n:"Estruturar para crescer",fim:"Empresa pronta para crescer com previsibilidade, sem depender do dono para tudo."}];
+const FRENTES=[
+  {k:"margem",t:"Margem, custos e perdas",pil:["Financeiro","Precificação","Estoque + Perdas"],obj:"Enxergar o resultado real e parar de perder margem em preço, custos e perdas."},
+  {k:"comercial",t:"Máquina comercial",pil:["Comercial","Marketing"],obj:"Transformar vendas que dependem de sorte e indicação em um processo previsível."},
+  {k:"pessoas",t:"Pessoas e processos",pil:["Operacional"],obj:"Tirar o dono do operacional e fazer a equipe entregar no padrão sem depender dele."}];
+const QUAD={rapidos:{t:"Ganhos rápidos",d:"Alto impacto, pouco esforço — começar já."},estrut:{t:"Projetos estruturantes",d:"Alto impacto, exigem mais tempo — planejar e iniciar."},
+  ajustes:{t:"Ajustes simples",d:"Impacto menor, fáceis de resolver — encaixar na rotina."},depois:{t:"Pode esperar",d:"Impacto menor e mais esforço — deixar para depois."}};
+function plano(s,c){
+  const val=v=>c.modo==="saudavel"?v.teto:v.valor;
+  const itens=c.crit.map(x=>({...x,reais:c.vaz.filter(v=>v.q===x.q.id).reduce((a,v)=>a+(val(v)||0),0),esf:ONDA[x.q.id]||2}));
+  const maxR=Math.max(0,...itens.map(i=>i.reais));
+  itens.forEach(i=>{ i.imp=(maxR?i.reais/maxR:0)*.5+(i.q.peso/3)*.3+(i.n==="b"?1:.5)*.2; i.alto=i.imp>=.5;
+    i.quad=i.alto?(i.esf<=2?"rapidos":"estrut"):(i.esf<=2?"ajustes":"depois"); });
+  itens.sort((a,b)=>b.imp-a.imp);
+  const frentes=FRENTES.map(f=>{
+    const its=itens.filter(i=>f.pil.includes(i.q.pilar));
+    const qs=qsDe(s).filter(q=>f.pil.includes(q.pilar));
+    return {...f,its,reais:its.reduce((a,i)=>a+i.reais,0),nota:scoreOf(qs,s.respostas),
+      status:its.some(i=>i.tipo==="Prioridade")?"Crítica":its.length?"Atenção":"Saudável",
+      partida:[...its].sort((a,b)=>a.esf-b.esf||b.imp-a.imp)[0]||null};
+  });
+  const ondas=ONDAS.map((o,k)=>({...o,its:itens.filter(i=>i.esf===k+1)}));
+  const comecar=(ondas[0].its.length?ondas[0].its:itens).slice(0,3);
+  return {itens,frentes,ondas,achados:itens.slice(0,3),comecar};
+}
+const primeiraFrase=t=>{t=String(t||""); const m=t.match(/^.*?[.:](\s|$)/); return (m?m[0]:t).trim();};
+
 /* ---------- documento ---------- */
 /* Tabela em divs: cada linha é um bloco que não é cortado entre páginas; o cabeçalho viaja junto com a 1ª linha (e com o título, se houver). */
 function dTable(cols,head,rows,lead=""){
@@ -1373,7 +1462,8 @@ function reportHTML(s){
   const tempoTxt=n.tempo?TEMPOS.find(t=>t.v===n.tempo)?.t.toLowerCase():null;
   const quotes=DOR.filter(d=>dorItens(s.dor[d.k]).some(x=>String(x).trim()));
   const parecer=autoParecer(s), prox=proximoTxt(s);
-  const crit=c.crit;
+  const crit=c.crit, P=plano(s,c), quem=e.decisor||"o empresário";
+  const temPerda=(c.modo==="margem"||c.modo==="estimativa")&&c.perda>0;
   return `<div class="doc">
   <div class="d-cover">
     <div><div class="logo">${RASTER?logoPNG():LOGO}<span>berry</span></div>
@@ -1382,6 +1472,17 @@ function reportHTML(s){
       <div class="sub">${[e.tipo?SEGMENTOS[e.tipo].t:"",e.segmento].filter(Boolean).map(esc).join(" · ")}${e.funcionarios?` · ${e.funcionarios==="Só o dono"?"Só o dono":esc(e.funcionarios)+" funcionários"}`:""}</div></div>
     <div class="d-meta">${hoje}<br>${e.decisor?`Para <b>${esc(e.decisor)}</b>${e.cargo?`, ${esc(e.cargo)}`:""}<br>`:""}${e.consultor?`Consultor: <b>${esc(e.consultor)}</b>`:""}</div>
   </div>
+
+  <section class="avoid d-exec"><h2>Resumo executivo</h2>
+    <p class="ex-lead">${esc(e.nome||"A empresa")} está no nível <b>${c.mat?c.mat.t.toLowerCase():"—"}</b> de maturidade de gestão (nota <b>${dec(c.nota)}</b> de 10)${temPerda?` e ${c.modo==="estimativa"?"perde, por estimativa,":"deixa"} <b class="ex-red">${brl(c.perda)} por mês</b> na mesa — <b>${brl(c.perdaAno)}</b> em 12 meses`:c.modo==="saudavel"?`, com margem dentro da referência e até <b>${brl(c.extra)}/mês</b> de resultado adicional possível`:""}.</p>
+    <div class="ex-grid">
+      <div><div class="ex-k">Os 3 achados principais</div>
+        ${P.achados.length?`<ol class="ex-list">${P.achados.map(i=>`<li><b>${esc(i.q.ponto)}</b>${i.reais>0?` <span class="ex-r">${brl(i.reais)}/mês</span>`:""}<br><span>${esc(primeiraFrase(i.n==="b"?i.q.pb:i.q.pi))}</span></li>`).join("")}</ol>`:`<p class="ex-p">Nenhum ponto crítico identificado.</p>`}</div>
+      <div><div class="ex-k">Por onde começar</div>
+        ${P.comecar.length?`<ol class="ex-list">${P.comecar.map(i=>`<li><b>${esc(i.q.ponto)}</b><br><span>${esc(i.q.pilarNome)} · ${QUAD[i.quad].t.toLowerCase()}</span></li>`).join("")}</ol>`:""}
+        ${temPerda?`<div class="ex-wait">Cada mês sem agir custa <b>${brl(c.perda)}</b>. Esperar 3 meses para começar significa <b>${brl(c.perda*3)}</b> a mais perdidos.</div>`:""}</div>
+    </div>
+  </section>
 
   <section class="avoid"><h2>Onde a empresa está hoje</h2>
     <div class="d-kpis">
@@ -1405,6 +1506,7 @@ function reportHTML(s){
         ${c.acum!=null?`<div class="row"><span>Já perdido (${tempoTxt})</span><b>${brl(c.acum)}</b></div>`:""}
       </div></div>`}</div>
     ${c.modo==="margem"?resBars(c):""}
+    ${temPerda?`<div class="d-wait avoid"><div class="w-h">O custo de esperar</div>${[3,6,12].map(m=>`<div class="w-t"><span>Se nada mudar em ${m} meses</span><b>${brl(c.perda*m)}</b></div>`).join("")}</div>`:""}
     <div class="d-tbl" style="margin-top:14px">${dTable("minmax(0,1fr) 170px 96px",
       [c.modo==="margem"?"De onde vem a diferença":"Onde está vazando","Origem",`<span style="display:block;text-align:right">Por mês</span>`],
       [...c.vaz.map(v=>({cells:[`<div class="pt">${esc(v.t)}</div>${esc(v.d)}`,
@@ -1422,10 +1524,34 @@ function reportHTML(s){
     ${c.melhor?`<div class="d-best"><div class="g">Melhor área<b>${c.melhor.p} · ${pct(c.melhor.v)}</b></div><div class="r">Área com maior potencial de melhoria<b>${c.pior.p} · ${pct(c.pior.v)}</b></div></div>`:""}
   </section>
 
+  ${P.itens.length?`<section><div class="avoid"><h2>Frentes de trabalho</h2>
+    <p class="d-intro">Os problemas encontrados se concentram em três frentes. Cada uma tem um objetivo e um valor em jogo.</p>
+    <div class="d-fr">${P.frentes.map(f=>`<div class="fr ${f.status==="Crítica"?"crit":f.status==="Atenção"?"aten":"ok"}">
+      <div class="fr-top"><span class="fr-st">${f.status}</span>${f.nota!=null?`<span class="fr-n">${pct(f.nota)}</span>`:""}</div>
+      <div class="fr-t">${f.t}</div><div class="fr-o">${f.obj}</div>
+      <div class="fr-r"><span>Em jogo</span><b>${f.reais>0?brl(f.reais)+"/mês":"—"}</b></div>
+      <div class="fr-c"><span>${f.its.length} ${f.its.length===1?"ponto":"pontos"} a resolver</span>${f.partida?`<span>Ponto de partida: <b>${esc(f.partida.q.ponto)}</b></span>`:""}</div>
+    </div>`).join("")}</div></div></section>
+
+  <section class="avoid"><h2>Matriz de prioridades</h2>
+    <p class="d-intro">Cada ponto crítico posicionado pelo impacto no resultado e pelo esforço para resolver.</p>
+    <div class="d-mx"><div class="mx-y">Impacto ↑</div>
+      <div class="mx-g">${["rapidos","estrut","ajustes","depois"].map(k=>`<div class="mx-q q-${k}"><div class="mx-h">${QUAD[k].t}</div><div class="mx-d">${QUAD[k].d}</div>
+        ${P.itens.filter(i=>i.quad===k).map(i=>`<div class="mx-i"><span>${esc(i.q.ponto)}</span>${i.reais>0?`<b>${brl(i.reais)}</b>`:""}</div>`).join("")||`<div class="mx-v">—</div>`}</div>`).join("")}</div>
+      <div class="mx-x">Esforço para resolver →</div></div>
+  </section>`:""}
+
   ${crit.length?`<section>${dTable("118px minmax(0,1fr) minmax(0,1fr)",["Classificação","Problema","Caminho de solução"],
     crit.map(x=>({cells:[`<span class="pill ${x.tipo==="Prioridade"?"b":x.tipo==="Oportunidade"?"i":"n"}">${x.tipo}</span><div class="pl" style="margin-top:6px">${esc(x.q.pilarNome)}</div>`,
       `<div class="pt">${esc(x.q.ponto)}</div>${esc(x.n==="b"?x.q.pb:x.q.pi)}`,`<div class="sol">${esc(x.q.sol)}</div>`]})),
     `<h2>Pontos críticos e caminhos de solução</h2><div class="d-counts"><span><b>${c.prior}</b> prioridades</span><span><b>${c.oport}</b> oportunidades</span><span><b>${crit.length-c.prior-c.oport}</b> pontos de atenção</span></div>`)}</section>`:""}
+
+  ${P.itens.length?`<section class="avoid"><h2>Roteiro dos próximos 90 dias</h2>
+    <p class="d-intro">A ordem recomendada para atacar os pontos críticos. Escopo, responsáveis e indicadores de cada etapa são detalhados no plano de trabalho.</p>
+    <div class="d-road">${P.ondas.map((o,k)=>`<div class="rd"><div class="rd-h"><span class="rd-k">${k+1}</span><div><div class="rd-t">${o.t}</div><div class="rd-n">${o.n}</div></div></div>
+      ${o.its.length?`<ul>${o.its.map(i=>`<li>${esc(i.q.ponto)}</li>`).join("")}</ul>`:`<p class="rd-v">Sem pontos críticos nesta etapa.</p>`}
+      <div class="rd-f"><b>Ao final:</b> ${o.fim}</div></div>`).join("")}</div>
+  </section>`:""}
 
   ${quotes.length?`<section>${(()=>{const qd=d=>{const v=s.dor[d.k]; return `<div class="d-quote"><div class="qq">${esc(d.q)}</div>${Array.isArray(v)?`<p class="lst">${v.map(x=>"• "+esc(x)).join("<br>")}</p>`:d.op.includes(v)?`<p class="lst">${esc(v)}</p>`:`<p>“${esc(String(v).trim())}”</p>`}</div>`;};
       const pares=[]; for(let k=0;k<quotes.length;k+=2) pares.push(`<div class="d-quotes">${quotes.slice(k,k+2).map(qd).join("")}</div>`);
@@ -1435,6 +1561,16 @@ function reportHTML(s){
   <section class="avoid"><h2>Parecer</h2>
     <div class="d-parecer">${esc(parecer)}</div>
     ${prox?`<div class="d-next"><b>Próximo passo:</b> ${esc(prox)}</div>`:""}</section>
+
+  <section class="avoid d-prem"><h2>Como chegamos a esses números</h2>
+    <ul>
+      <li>Faturamento, resultado e demais informações foram declarados por ${esc(quem)} na reunião e não foram auditados.</li>
+      ${c.modo==="margem"?`<li>Lucro de referência: margem de ${numBR(c.refPct)}% sobre o faturamento — o que costuma sobrar em ${SEGMENTOS[tipoDe(s)].bem}.</li>`:""}
+      ${temPerda?`<li>O valor de cada problema é uma estimativa conservadora, limitada a um teto por problema; a soma nunca ultrapassa a diferença total${c.modo==="margem"?" entre o lucro atual e o de referência":""}.</li>`:""}
+      <li>Os níveis de maturidade foram atribuídos a partir das respostas dadas na reunião, em ${PERGUNTAS.length} perguntas distribuídas em 6 pilares.</li>
+      <li>A matriz e o roteiro indicam prioridade e ordem recomendadas; prazos e escopo são definidos no plano de trabalho.</li>
+    </ul>
+  </section>
 
   <div class="d-foot"><span>Berry · Diagnóstico empresarial</span><span>${esc(e.nome||"")} · ${hoje}</span></div>
 </div>`;
